@@ -64,11 +64,21 @@ if command -v gh >/dev/null 2>&1; then
   PR_TITLE="${PR_TITLE:-"Build update"}"
   PR_BODY="${PR_BODY:-"Automated build + push from npm script."}"
 
-  if gh pr view --head "$BRANCH" >/dev/null 2>&1; then
+  if gh pr view "$BRANCH" --json url >/dev/null 2>&1; then
     echo "ℹ️  PR already exists for $BRANCH"
   else
-    gh pr create --base "$BASE_BRANCH" --head "$BRANCH" --title "$PR_TITLE" --body "$PR_BODY" || true
-    echo "✅ PR created (or attempted) via gh"
+    PR_URL=$(gh pr create \
+      --base "$BASE_BRANCH" \
+      --head "$BRANCH" \
+      --title "$PR_TITLE" \
+      --body "$PR_BODY" 2>/dev/null || true)
+
+    if [[ -n "$PR_URL" ]]; then
+      echo "✅ PR created:"
+      echo "$PR_URL"
+    else
+      echo "ℹ️ PR creation skipped or failed."
+    fi
   fi
 else
   echo "ℹ️  gh not found; skipping PR creation."

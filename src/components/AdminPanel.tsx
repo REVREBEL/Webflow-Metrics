@@ -228,6 +228,41 @@ export function AdminPanel() {
     }
   };
 
+  const handleEditHotel = (hotel: Hotel) => {
+    setFormData({
+      hotel_code: hotel.hotel_code,
+      hotel_name: hotel.hotel_name,
+      project_id: hotel.project_id,
+      dataset_id: hotel.dataset_id || '',
+      table_id: hotel.table_id || '',
+      data_location: hotel.data_location,
+      service_account_json: '', // Leave empty for security - user must re-enter
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteHotel = async (hotelCode: string) => {
+    if (!confirm(`Are you sure you want to delete hotel ${hotelCode}? This cannot be undone.`)) return;
+
+    try {
+      const response = await fetch(`${baseUrl}/api/admin/hotels?hotel_code=${hotelCode}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json() as { error?: string; success?: boolean };
+
+      if (response.ok) {
+        setSuccess('Hotel deleted successfully!');
+        fetchHotels();
+      } else {
+        setError(data.error || 'Failed to delete hotel');
+      }
+    } catch (err) {
+      setError('Failed to delete hotel');
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-8 flex items-center justify-between">
@@ -275,7 +310,7 @@ export function AdminPanel() {
         </Alert>
       )}
 
-      <Tabs defaultValue="query-builder" className="w-full">
+      <Tabs defaultValue="hotels" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="query-builder">Query Builder</TabsTrigger>
           <TabsTrigger value="table-registry">Table Registry</TabsTrigger>
@@ -283,17 +318,7 @@ export function AdminPanel() {
         </TabsList>
 
         <TabsContent value="query-builder" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Visual Query Builder</CardTitle>
-              <CardDescription>
-                Build queries visually with drag-and-drop or write custom SQL
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <QueryBuilder />
-            </CardContent>
-          </Card>
+          <QueryBuilder />
         </TabsContent>
 
         <TabsContent value="table-registry" className="space-y-6">
@@ -449,7 +474,10 @@ export function AdminPanel() {
             <CardHeader>
               <CardTitle>Add/Update Hotel Configuration</CardTitle>
               <CardDescription>
-                Configure BigQuery credentials and settings for each hotel property
+                {formData.hotel_code 
+                  ? `Editing: ${formData.hotel_name} (${formData.hotel_code}) - Re-enter Service Account JSON to update credentials`
+                  : 'Configure BigQuery credentials and settings for each hotel property'
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -537,8 +565,27 @@ export function AdminPanel() {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={dbInitialized === false}>
-                  Save Hotel Configuration
+                  {formData.hotel_code ? 'Update Hotel Configuration' : 'Save Hotel Configuration'}
                 </Button>
+                
+                {formData.hotel_code && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setFormData({
+                      hotel_code: '',
+                      hotel_name: '',
+                      service_account_json: '',
+                      data_location: 'US',
+                      project_id: '',
+                      dataset_id: '',
+                      table_id: ''
+                    })}
+                  >
+                    Cancel Edit
+                  </Button>
+                )}
               </form>
             </CardContent>
           </Card>
@@ -579,6 +626,22 @@ export function AdminPanel() {
                           Updated: {new Date(hotel.updated_at || hotel.created_at || Date.now()).toLocaleDateString()}
                         </p>
                       </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditHotel(hotel)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteHotel(hotel.hotel_code)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -590,4 +653,7 @@ export function AdminPanel() {
     </div>
   );
 }
+
+
+
 

@@ -3,7 +3,6 @@
 
 
 
-
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -58,6 +57,8 @@ interface SavedTemplate {
 }
 
 export function QueryBuilder() {
+  console.log('QueryBuilder component mounting...');
+  
   const [tables, setTables] = useState<BigQueryTable[]>([]);
   const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([]);
   const [selectedTable, setSelectedTable] = useState<BigQueryTable | null>(null);
@@ -81,8 +82,10 @@ export function QueryBuilder() {
   const [generatedSql, setGeneratedSql] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('QueryBuilder useEffect running...');
     fetchTables();
     fetchTemplates();
   }, []);
@@ -94,21 +97,33 @@ export function QueryBuilder() {
   }, [selectedTable, aggregationType, aggregationColumn, groupByColumns, filters]);
 
   const fetchTables = async () => {
+    console.log('Fetching tables...');
     try {
       const response = await fetch(`${baseUrl}/api/admin/bigquery/tables`);
       const data = await response.json();
+      console.log('Tables response:', response.status, data);
       if (response.ok) {
-        setTables(data);
+        setTables(Array.isArray(data) ? data : []);
+      } else if (data.error?.includes('no such table') || data.error?.includes('Database not configured')) {
+        console.warn('Table registry not initialized yet');
+        setTables([]);
+      } else {
+        setError(data.error || 'Failed to fetch tables');
       }
     } catch (err) {
       console.error('Error fetching tables:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchTemplates = async () => {
+    console.log('Fetching templates...');
     try {
       const response = await fetch(`${baseUrl}/api/admin/templates/v2`);
       const data = await response.json();
+      console.log('Templates response:', data);
       if (response.ok) {
         setSavedTemplates(data);
       }
@@ -291,6 +306,34 @@ ${groupByClause}`.trim();
   const filterableColumns = selectedTable?.columns.filter(c => c.is_filterable) || [];
   const groupableColumns = selectedTable?.columns.filter(c => c.is_groupable) || [];
   const aggregatableColumns = selectedTable?.columns.filter(c => c.is_aggregatable) || [];
+
+  console.log('QueryBuilder rendering, loading:', loading, 'tables:', tables.length);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center space-y-3">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading Query Builder...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (tables.length === 0) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="text-6xl">📊</div>
+          <h3 className="text-xl font-semibold">No Tables Registered</h3>
+          <p className="text-muted-foreground">
+            To create query templates, you first need to register your BigQuery tables.
+            Go to the <strong>BigQuery Config</strong> tab to discover and register tables from your schema.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -729,6 +772,9 @@ ${groupByClause}`.trim();
     </div>
   );
 }
+
+
+
 
 
 

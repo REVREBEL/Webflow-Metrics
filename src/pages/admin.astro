@@ -1,0 +1,8 @@
+---
+import MainLayout from '../layouts/main.astro';
+import { AdminPanel } from '../components/AdminPanel';
+---
+
+<MainLayout>
+  <AdminPanel client:only="react" />
+</MainLayout>

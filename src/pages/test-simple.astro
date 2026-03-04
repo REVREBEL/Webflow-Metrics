@@ -1,0 +1,57 @@
+---
+// Absolute minimal test page
+import { baseUrl } from '../lib/base-url';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href={baseUrl || '/'} class="back-link">← Back to Home</a>
+    
+    <h1>Simple Test Page</h1>
+    <p>If you can see this, basic Astro rendering is working.</p>
+    
+    <h2>Environment Check</h2>
+    <p><strong>Test:</strong> {Math.random()}</p>
+    
+    <h2>Links</h2>
+    <ul>
+      <li><a href={baseUrl || '/'}>Home</a></li>
+      <li><a href={`${baseUrl}/admin`}>Admin</a></li>
+      <li><a href={`${baseUrl}/dashboard`}>Dashboard</a></li>
+      <li><a href={`${baseUrl}/dashboard-debug`}>Dashboard Debug</a></li>
+    </ul>
+  </div>
+</body>
+</html>
+

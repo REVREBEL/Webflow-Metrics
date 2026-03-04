@@ -1,0 +1,23 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "verbatimModuleSyntax": false,
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": [
+    ".astro",
+    ".codesandbox",
+    ".devcontainer",
+    "dist",
+    "generated",
+    "node_modules",
+    "src/site-components/**/*",
+    "lost+found"
+  ]
+}

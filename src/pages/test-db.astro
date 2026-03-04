@@ -1,0 +1,237 @@
+
+
+
+
+---
+// Deep inspection of ALL possible locations for DB binding
+const locals = Astro.locals;
+const context = Astro as any;
+
+let dbStatus = 'not-found';
+let dbLocation = null;
+let error = null;
+let tables = [];
+let debugInfo: any = {};
+
+// Inspect EVERYTHING
+debugInfo.localsKeys = locals ? Object.keys(locals) : [];
+debugInfo.contextKeys = Object.keys(context).filter(k => !k.startsWith('_') && k !== 'props');
+
+// Check request object
+debugInfo.requestKeys = context.request ? Object.keys(context.request).slice(0, 20) : [];
+
+// Try various known patterns
+const possiblePaths = [
+  { name: 'locals.runtime.env', value: (locals as any)?.runtime?.env },
+  { name: 'locals.runtime', value: (locals as any)?.runtime },
+  { name: 'context.locals', value: context.locals },
+  { name: 'context.env', value: context.env },
+  { name: 'Astro.env', value: (Astro as any).env },
+  { name: 'context.clientAddress', value: context.clientAddress },
+];
+
+debugInfo.paths = possiblePaths.map(p => ({
+  name: p.name,
+  exists: !!p.value,
+  type: typeof p.value,
+  keys: p.value && typeof p.value === 'object' ? Object.keys(p.value).slice(0, 10) : null
+}));
+
+// Check if DB exists anywhere in locals
+let db = null;
+
+// First, try the standard Cloudflare pattern
+const env = (locals as any)?.runtime?.env;
+if (env?.DB) {
+  db = env.DB;
+  dbLocation = 'locals.runtime.env.DB';
+  dbStatus = 'found';
+}
+
+// If not found, scan all keys
+if (!db && locals) {
+  for (const key of Object.keys(locals)) {
+    const val = (locals as any)[key];
+    if (val && typeof val === 'object') {
+      debugInfo[`locals.${key}`] = {
+        type: typeof val,
+        keys: Object.keys(val).slice(0, 10),
+        hasDB: !!val.DB,
+        hasD1: !!val.D1,
+      };
+      
+      // Check if this is the env object
+      if (val.DB && typeof val.DB === 'object') {
+        db = val.DB;
+        dbLocation = `locals.${key}.DB`;
+        dbStatus = 'found';
+      }
+      
+      // Check nested env
+      if (val.env?.DB && typeof val.env.DB === 'object') {
+        db = val.env.DB;
+        dbLocation = `locals.${key}.env.DB`;
+        dbStatus = 'found';
+      }
+    }
+  }
+}
+
+// Also check Astro.props
+if (context.props && typeof context.props === 'object') {
+  debugInfo.propsKeys = Object.keys(context.props);
+}
+
+if (db && db.prepare) {
+  try {
+    const result = await db.prepare(`
+      SELECT name FROM sqlite_master WHERE type='table'
+    `).all();
+    tables = result.results || [];
+  } catch (e: any) {
+    error = 'Query error: ' + e.message;
+  }
+} else if (db) {
+  error = 'DB object found but has no .prepare() method. Type: ' + typeof db + ', Keys: ' + (db ? Object.keys(db).join(', ') : 'none');
+} else {
+  error = 'No DB binding found in any inspected location';
+}
+---
+
+<html>
+<head>
+  <title>Database Test - Deep Inspection</title>
+  <style>
+    body { font-family: monospace; padding: 2rem; background: #1a1a1a; color: #fff; max-width: 1400px; margin: 0 auto; font-size: 14px; }
+    .status { padding: 1rem; margin: 1rem 0; border-radius: 8px; }
+    .success { background: #0a5; }
+    .error { background: #a05; }
+    .warning { background: #a50; }
+    .info { background: #05a; }
+    pre { background: #2a2a2a; padding: 1rem; border-radius: 4px; overflow: auto; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; max-height: 400px; }
+    h2 { margin-top: 2rem; color: #6cf; }
+    h3 { color: #fc6; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Deep Runtime Inspection</h1>
+  
+  <div class={`status ${dbStatus === 'found' ? 'success' : 'error'}`}>
+    <strong>DB Binding Status:</strong> {dbStatus}
+    {dbLocation && <div style="margin-top: 0.5rem;">✅ Found at: <code>{dbLocation}</code></div>}
+  </div>
+
+  {error && (
+    <div class="status error">
+      <strong>Error:</strong> {error}
+    </div>
+  )}
+
+  <h2>📊 Path Inspection</h2>
+  <div class="status info">
+    <strong>Checked paths:</strong>
+    <pre>{JSON.stringify(debugInfo.paths, null, 2)}</pre>
+  </div>
+
+  <h2>🔑 Available Keys</h2>
+  
+  <h3>Astro.locals keys:</h3>
+  <div class="status info">
+    <pre>{JSON.stringify(debugInfo.localsKeys, null, 2)}</pre>
+  </div>
+
+  <h3>Astro context keys:</h3>
+  <div class="status info">
+    <pre>{JSON.stringify(debugInfo.contextKeys, null, 2)}</pre>
+  </div>
+
+  <h3>Request keys:</h3>
+  <div class="status info">
+    <pre>{JSON.stringify(debugInfo.requestKeys, null, 2)}</pre>
+  </div>
+
+  {debugInfo.propsKeys && (
+    <>
+      <h3>Props keys:</h3>
+      <div class="status info">
+        <pre>{JSON.stringify(debugInfo.propsKeys, null, 2)}</pre>
+      </div>
+    </>
+  )}
+
+  <h2>🔎 Locals Deep Scan</h2>
+  {Object.entries(debugInfo).filter(([k]) => k.startsWith('locals.')).map(([key, value]) => (
+    <div class="status info">
+      <strong>{key}:</strong>
+      <pre>{JSON.stringify(value, null, 2)}</pre>
+    </div>
+  ))}
+
+  <h2>📝 Full Debug Info</h2>
+  <div class="status info">
+    <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+  </div>
+
+  {tables.length > 0 ? (
+    <div class="status success">
+      <strong>✅ Tables Found:</strong> {tables.length}
+      <pre>{JSON.stringify(tables, null, 2)}</pre>
+    </div>
+  ) : dbStatus === 'found' ? (
+    <div class="status warning">
+      <strong>⚠️ Tables:</strong> None found (database needs initialization)
+      <button id="initBtn" style="margin-top: 1rem; padding: 0.5rem 1rem; cursor: pointer; background: #0a5; color: white; border: none; border-radius: 4px;">
+        Initialize Database
+      </button>
+      <pre id="result" style="margin-top: 1rem;"></pre>
+    </div>
+  ) : null}
+
+  {dbStatus === 'not-found' && (
+    <div style="margin-top: 2rem; padding: 1rem; background: #a05; border-radius: 8px;">
+      <h3>⚠️ Critical Issue</h3>
+      <p><strong>The DB binding exists in paths but couldn't be accessed.</strong></p>
+      <p>Debug info above shows locals.runtime.env has a "DB" key, but the code failed to retrieve it.</p>
+      <p>This might be a timing issue or a proxy object that needs special handling.</p>
+    </div>
+  )}
+
+  <script define:vars={{ dbStatus }}>
+    const btn = document.getElementById('initBtn');
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        const resultEl = document.getElementById('result');
+        btn.disabled = true;
+        btn.textContent = 'Initializing...';
+        resultEl.textContent = 'Loading...';
+        
+        try {
+          const response = await fetch('/api/admin/init-database', {
+            method: 'POST'
+          });
+          const data = await response.json();
+          resultEl.textContent = JSON.stringify(data, null, 2);
+          
+          if (data.success) {
+            btn.textContent = '✅ Success!';
+            setTimeout(() => location.reload(), 2000);
+          } else {
+            btn.textContent = '❌ Failed';
+            btn.disabled = false;
+          }
+        } catch (err) {
+          resultEl.textContent = 'Error: ' + err.message;
+          btn.textContent = '❌ Error';
+          btn.disabled = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,114 @@
+---
+import MainLayout from '../layouts/main.astro';
+import { baseUrl } from '../lib/base-url';
+
+// Test the API directly server-side
+let serverTestResult = 'Not tested';
+let dbStatus = 'Unknown';
+
+try {
+  const env = (Astro.locals as any).runtime?.env;
+  const db = env?.DB;
+  
+  if (!db) {
+    dbStatus = 'Database not configured';
+  } else {
+    dbStatus = 'Database connected';
+    
+    // Try to fetch hotels
+    const { results } = await db
+      .prepare('SELECT hotel_code, hotel_name FROM hotels ORDER BY hotel_name')
+      .all();
+    
+    serverTestResult = JSON.stringify(results, null, 2);
+  }
+} catch (error: any) {
+  serverTestResult = `Error: ${error.message}`;
+  dbStatus = 'Error';
+}
+---
+
+<MainLayout>
+  <div class="min-h-screen bg-background p-8">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <a 
+        href={baseUrl || '/'}
+        class="inline-block text-primary hover:underline mb-4"
+      >
+        ← Back to Home
+      </a>
+      
+      <h1 class="text-3xl font-bold">Dashboard Debug Info</h1>
+      
+      <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Server-Side Test</h2>
+        <div class="space-y-2">
+          <p><strong>Database Status:</strong> <span class="text-primary">{dbStatus}</span></p>
+          <p><strong>Base URL:</strong> <code class="bg-muted px-2 py-1 rounded">{baseUrl}</code></p>
+        </div>
+        
+        <div class="bg-muted p-4 rounded">
+          <p class="font-semibold mb-2">Hotels Query Result:</p>
+          <pre class="text-xs overflow-auto">{serverTestResult}</pre>
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Client-Side Test</h2>
+        <button 
+          id="test-api"
+          class="bg-primary text-primary-foreground px-4 py-2 rounded hover:opacity-90"
+        >
+          Test API Endpoint
+        </button>
+        <div id="api-result" class="mt-4 bg-muted p-4 rounded hidden">
+          <p class="font-semibold mb-2">API Response:</p>
+          <pre id="api-output" class="text-xs overflow-auto"></pre>
+        </div>
+      </div>
+
+      <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Actions</h2>
+        <div class="space-x-4">
+          <a 
+            href={`${baseUrl}/dashboard`}
+            class="inline-block bg-primary text-primary-foreground px-4 py-2 rounded hover:opacity-90"
+          >
+            Go to Dashboard
+          </a>
+          <a 
+            href={`${baseUrl}/admin`}
+            class="inline-block bg-secondary text-secondary-foreground px-4 py-2 rounded hover:opacity-90"
+          >
+            Go to Admin
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<script define:vars={{ baseUrl }}>
+  document.getElementById('test-api')?.addEventListener('click', async () => {
+    const resultDiv = document.getElementById('api-result');
+    const outputPre = document.getElementById('api-output');
+    
+    if (!resultDiv || !outputPre) return;
+    
+    resultDiv.classList.remove('hidden');
+    outputPre.textContent = 'Loading...';
+    
+    try {
+      const response = await fetch(`${baseUrl}/api/client/hotels`);
+      const data = await response.json();
+      
+      outputPre.textContent = JSON.stringify({
+        status: response.status,
+        ok: response.ok,
+        data: data
+      }, null, 2);
+    } catch (error) {
+      outputPre.textContent = `Error: ${error.message}`;
+    }
+  });
+</script>

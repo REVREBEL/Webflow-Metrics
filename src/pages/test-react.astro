@@ -1,0 +1,30 @@
+---
+import MainLayout from '../layouts/main.astro';
+import { TestComponent } from '../components/TestComponent';
+import { baseUrl } from '../lib/base-url';
+---
+
+<MainLayout>
+  <div class="min-h-screen bg-background p-8">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <a 
+        href={baseUrl || '/'}
+        class="inline-block text-primary hover:underline mb-4"
+      >
+        ← Back to Home
+      </a>
+      
+      <h1 class="text-3xl font-bold mb-4">React Test Page</h1>
+      
+      <div class="bg-card p-6 rounded-lg border border-border">
+        <h2 class="text-xl font-semibold mb-4">Static Content (Astro)</h2>
+        <p class="text-muted-foreground">This text is rendered by Astro.</p>
+      </div>
+      
+      <div class="bg-card p-6 rounded-lg border border-border">
+        <h2 class="text-xl font-semibold mb-4">Dynamic Content (React)</h2>
+        <TestComponent client:only="react" />
+      </div>
+    </div>
+  </div>
+</MainLayout>

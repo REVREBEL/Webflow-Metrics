@@ -1,0 +1,165 @@
+
+
+
+---
+import MainLayout from '../layouts/main.astro';
+import { baseUrl } from '../lib/base-url';
+---
+
+<MainLayout>
+  <div class="min-h-screen bg-background flex items-center justify-center p-8">
+    <div class="max-w-4xl w-full space-y-8">
+      {/* Header */}
+      <div class="text-center space-y-4">
+        <h1 class="text-5xl font-bold font-heading text-primary">
+          BigQuery Dashboard
+        </h1>
+        <p class="text-xl text-muted-foreground">
+          Real-time Analytics & Metrics
+        </p>
+      </div>
+
+      {/* Cards */}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Client Dashboard Card */}
+        <a
+          href={`${baseUrl}/dashboard`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <div class="text-4xl">📊</div>
+            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+              Dashboard
+            </h2>
+            <p class="text-muted-foreground">
+              View real-time metrics and analytics for your hotels
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              View Dashboard
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        {/* Admin Panel Card */}
+        <a
+          href={`${baseUrl}/admin`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <div class="text-4xl">⚙️</div>
+            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+              Admin Panel
+            </h2>
+            <p class="text-muted-foreground">
+              Configure hotels, credentials, and query templates
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              Open Admin
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        {/* Component Showcase Card */}
+        <a
+          href={`${baseUrl}/showcase`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <div class="text-4xl">🎨</div>
+            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+              Component Showcase
+            </h2>
+            <p class="text-muted-foreground">
+              View all available charts, stats cards, and UI components
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              View Showcase
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      {/* Features */}
+      <div class="mt-12 p-6 bg-muted rounded-lg">
+        <h3 class="text-lg font-semibold mb-4 font-heading">Features</h3>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-muted-foreground">
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Secure BigQuery integration</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Encrypted credential storage</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Dynamic query templates</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Real-time metric updates</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Multi-hotel support</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Date range filtering</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Professional chart components</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Statistics & metrics cards</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+
+
+

@@ -1,0 +1,727 @@
+:root {
+  --color-9: #eff5f6;
+  --light-1: #fafafa;
+  --primary: #163666;
+  --metric-label-font: Khand, Impact, sans-serif;
+  --dark-1: #163666;
+  --primary-label-font-weight: 700;
+  --metric-font: "Funnel Sans", sans-serif;
+  --metric-font-weight: 300;
+  --_apps---colors--border: var(--shade--grey-l700);
+  --color-2: #00a6b6;
+  --color-2-inverse: var(--color-5);
+  --color-7: #e05047;
+  --color-7-inverse: var(--color-4);
+  --kpi-card-border-raduis: 8px;
+  --color-4: #b2d3de;
+  --color-1: #047c97;
+  --color-3: #71c9c5;
+  --color-5: #faca78;
+  --color-6: #f37d59;
+  --dark-3: color-mix(in srgb, var(--dark-1) 60%, white 40%);
+  --variance-font-size-base: calc(var(--metric-font-size-base) * 0.85);
+  --metric-font-size-base: 1.15rem;
+  --label-label-font: Khand, Impact, sans-serif;
+  --label-label-font-weight: 650;
+  --variance-label-size-base: calc(var(--metric-font-size-base) * 0.75);
+  --label-padding-left: 0.3em;
+  --btn-radius: 2px;
+  --tag-radius: 0.35rem;
+  --tag-border-width: 3px;
+  --icon-xl: 0px;
+  --icon-base: 0px;
+  --icon-sm: 0px;
+  --icon-xs: 0px;
+  --icon-md: 0px;
+  --icon-lg: 0px;
+  --container-padding-horizontal: 0px;
+  --gap-xxs: 0px;
+  --page-padding-v: 0px;
+  --section-padding-vertical: 0px;
+  --1x: 1rem;
+  --1-25x: 1.25rem;
+  --2x: 2rem;
+  --4x: 4rem;
+  --5x: 5rem;
+  --6x: 6rem;
+  --8x: 8rem;
+  --75x: 0.75rem;
+  --max-width-xl: 1600px;
+  --5x-2: 0.5rem;
+  --1-75x: 1.75rem;
+  --max-width-sm: 1150px;
+  --3x: 3rem;
+  --quarter-size: 25%;
+  --1-5x: 1.5rem;
+  --25x: 0.25rem;
+  --7x: 7rem;
+  --max-width-md: 1280px;
+  --max-size-xs: 60%;
+  --3-quarters-size: 75%;
+  --max-width-xxl: 1820px;
+  --half-size: 50%;
+  --max-width-lg: 1440px;
+  --full-width: 100%;
+  --max-rem-md: 40rem;
+  --card-padding-h: 0px;
+  --card-border-width: 5px;
+  --card-card-headline-font: Khand, Impact, sans-serif;
+  --card-text-padding: 2%;
+  --card-radius: 0.25em;
+  --card-padding-v: 0px;
+  --card-text-size: 0px;
+  --card-lg-text-weight-hover: 0;
+  --card-lg-padding-v: 0px;
+  --card-lg-radius: 4px;
+  --card-lg-border-width: 4rem;
+  --card-lg-text-size: 1rem;
+  --label-border-width: 4px;
+  --card-lg-text-weight: 0;
+  --card-sm-border-width: 4px;
+  --card-lg-padding-h: 0px;
+  --card-sm-text-size: 0px;
+  --card-sm-padding-h: 0px;
+  --card-sm-text-weight-hover: 0;
+  --card-sm-padding-v: 0px;
+  --card-sm-text-weight: 0;
+  --card-sm-radius: 0.3rem;
+  --container-sm-width: 1000px;
+  --raduis-xs: 100rem;
+  --container-md-width: 1200px;
+  --gap-md: 0px;
+  --gap-xs: 0px;
+  --container-lg-width: 1440px;
+  --page-padding-h: 0px;
+  --container-xl-width: 1600px;
+  --gap-xxl: 0px;
+  --gap-sm: 0px;
+  --gap-xl: 0px;
+  --gap-lg: 0px;
+  --raduis-md: 0.5rem;
+  --raduis-lg: 0.75rem;
+  --raduis-sm: 0.25rem;
+  --raduis-xl: 1rem;
+  --max-width-xs: 900px;
+  --_apps---font--headline: Khand, Impact, sans-serif;
+  --_apps---font--body: "General Sans", Tahoma, sans-serif;
+  --_apps---font--button: Khand, Impact, sans-serif;
+  --_apps---font--metrics: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --_apps---sizes--radius: var(--raduis-sm);
+  --_apps---colors--background: var(--color-9);
+  --_apps---colors--foreground: var(--primary);
+  --_apps---colors--card: var(--light-1);
+  --_apps---colors--card-foreground: var(--primary);
+  --_apps---colors--popover: var(--color-4);
+  --_apps---colors--popover-foreground: var(--primary);
+  --_apps---colors--primary: var(--primary);
+  --_apps---colors--primary-foreground: var(--light-1);
+  --_apps---colors--secondary: var(--color-3);
+  --_apps---colors--secondary-foreground: var(--primary);
+  --_apps---colors--muted: var(--color-4);
+  --_apps---colors--muted-foreground: var(--primary);
+  --_apps---colors--accent: var(--color-2);
+  --_apps---colors--accent-foreground: var(--color-5);
+  --_apps---colors--destructive: var(--color-7);
+  --_apps---colors--input: white;
+  --_apps---colors--ring: var(--_apps---colors--secondary);
+  --_apps---charts--chart-1: var(--color-2);
+  --_apps---charts--chart-2: var(--color-3);
+  --_apps---charts--chart-3: var(--color-4);
+  --_apps---charts--chart-4: var(--color-5);
+  --_apps---charts--chart-5: var(--color-6);
+  --_apps---sidebar--sidebar: var(--light-1);
+  --_apps---sidebar--sidebar-foreground: var(--primary);
+  --_apps---sidebar--sidebar-primary: var(--color-2);
+  --_apps---sidebar--sidebar-primary-foreground: var(--color-2-inverse);
+  --_apps---sidebar--sidebar-accent: var(--color-5);
+  --_apps---sidebar--sidebar-accent-foreground: var(--color-5-inverse);
+  --_apps---sidebar--sidebar-border: var(--shade--grey-l700);
+  --_apps---sidebar--sidebar-ring: var(--color-3);
+  --_apps---colors--background-dark: var(--primary);
+  --_apps---colors--foreground-dark: var(--light-1);
+  --_apps---colors--card-dark: var(--_apps---colors--primary);
+  --_apps---colors--card-foreground-dark: var(--light-1);
+  --_apps---colors--popover-dark: var(--color-9);
+  --_apps---colors--popover-foreground-dark: hsl(210, 40%, 95%);
+  --_apps---colors--primary-dark: var(--light-1);
+  --_apps---colors--primary-foreground-dark: var(--primary);
+  --_apps---colors--secondary-dark: var(--color-1);
+  --_apps---colors--secondary-foreground-dark: var(--color-9);
+  --_apps---colors--muted-dark: var(--color-2);
+  --_apps---colors--muted-foreground-dark: var(--color-8);
+  --_apps---colors--accent-dark: var(--color-4);
+  --_apps---colors--accent-foreground-dark: var(--primary);
+  --_apps---colors--destructive-dark: var(--color-7);
+  --_apps---colors--border-dark: var(--shade--primary-l100);
+  --_apps---colors--input-dark: var(--primary);
+  --_apps---colors--ring-dark: var(--color-4);
+  --_apps---charts--chart-1-dark: var(--color-5);
+  --_apps---charts--chart-2-dark: var(--color-6);
+  --_apps---charts--chart-3-dark: var(--color-7-fade);
+  --_apps---charts--chart-4-dark: var(--color-8);
+  --_apps---charts--chart-5-dark: var(--color-4);
+  --_apps---charts--positive: var(--color-3);
+  --_apps---charts--negative: var(--color-7);
+  --_apps---sidebar--sidebar-dark: var(--primary);
+  --_apps---sidebar--sidebar-foreground-dark: var(--primary-inverse);
+  --_apps---sidebar--sidebar-primary-dark: var(--color-1);
+  --_apps---sidebar--sidebar-primary-foreground-dark: var(--color-1-inverse);
+  --_apps---sidebar--sidebar-accent-dark: var(--color-8);
+  --_apps---sidebar--sidebar-accent-foreground-dark: var(--color-8-inverse);
+  --_apps---sidebar--sidebar-border-dark: var(--dark-3);
+  --_apps---sidebar--sidebar-ring-dark: var(--color-3);
+  --_apps---metrics--total-inverse: var(--color-4);
+  --_apps---metrics--total: var(--primary);
+  --_apps---metrics--transient: var(--color-7);
+  --_apps---metrics--transient-inverse: var(--color-5);
+  --_apps---metrics--group: var(--color-1);
+  --_apps---metrics--group-inverse: var(--color-3);
+  --form-padding: 1.5rem;
+  --input-font: Supreme, Tahoma, sans-serif;
+  --input-font-weight: 400;
+  --input-font-size: 1rem;
+  --input-font-height: 1.5;
+  --input-border-width: 1px;
+  --input-padding-vertical: 1.75rem;
+  --input-padding-horizontal: 1rem;
+  --placeholder-font-size: 0.85rem;
+  --placeholder-font-weight: 300;
+  --color-8: #8e456a;
+  --grey-1: #ababab;
+  --grey-2: #575757;
+  --grey-3: #2e2e2e;
+  --light-2: color-mix(in srgb, var(--light-1) 80%, black 10%);
+  --light-3: color-mix(in srgb, var(--light-1) 80%, black 20%);
+  --dark-2: color-mix(in srgb, var(--dark-1) 80%, white 20%);
+  --alert: #e05047;
+  --error: #e05047;
+  --success: #00a6b6;
+  --warning: #faca78;
+  --disabled: var(--grey-2);
+  --primary-inverse: var(--color-4);
+  --color-1-inverse: var(--color-9);
+  --color-3-inverse: var(--color-8);
+  --color-4-inverse: var(--primary);
+  --color-5-inverse: var(--color-7);
+  --color-6-inverse: var(--primary);
+  --color-8-inverse: var(--color-4);
+  --color-9-inverse: var(--primary);
+  --grey-1-inverse: var(--grey-3);
+  --grey-2-inverse: #fafafa;
+  --grey-3-inverse: var(--grey-1);
+  --light-inverse: #163666;
+  --dark-inverse: #fafafa;
+  --primary-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--primary\<deleted\|variable-09c6bc4d-c8c2-95a1-0d0c-01b4bb79d435\>
+      )
+      80%,
+    white 20%
+  );
+  --color-1-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-1\<deleted\|variable-bd1c1520-c269-e8a6-dc21-a7bbd79495ae\>
+      )
+      70%,
+    white 30%
+  );
+  --color-2-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-2\<deleted\|variable-4a8b2c3d-96f6-6cca-9c50-cf2009b6a387\>
+      )
+      70%,
+    white 30%
+  );
+  --color-3-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-3\<deleted\|variable-e3a87203-6704-a571-43fb-262e8c7ffd9c\>
+      )
+      80%,
+    white 20%
+  );
+  --color-4-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-4\<deleted\|variable-4622ba0e-4098-2ec4-f78e-430f950a8964\>
+      )
+      70%,
+    white 30%
+  );
+  --color-5-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-5\<deleted\|variable-660bd154-9600-0c78-f857-27500023e382\>
+      )
+      80%,
+    white 20%
+  );
+  --color-6-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-6\<deleted\|variable-c41db252-43e1-d3d5-9afa-7643f2725142\>
+      )
+      80%,
+    white 20%
+  );
+  --color-7-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-7\<deleted\|variable-25603a0e-7322-3365-85e4-5e485c0e0bba\>
+      )
+      80%,
+    white 20%
+  );
+  --color-8-fade: color-mix(in srgb, var(--color-3-inverse) 80%, white 20%);
+  --color-9-fade: color-mix(
+    in srgb,
+    var(--color-1-inverse) 80%,
+    var(
+        --color-dark--primary\<deleted\|variable-09c6bc4d-c8c2-95a1-0d0c-01b4bb79d435\>
+      )
+      20%
+  );
+  --dark-fade: color-mix(in srgb, var(--dark-1) 90%, white 10%);
+  --color-1-inverse-fade: color-mix(
+    in srgb,
+    var(--color-1-inverse) 90%,
+    black 10%
+  );
+  --color-2-inverse-fade: color-mix(
+    in srgb,
+    var(--color-2-inverse) 80%,
+    white 20%
+  );
+  --color-3-inverse-fade: color-mix(
+    in srgb,
+    var(--color-3-inverse) 80%,
+    white 20%
+  );
+  --primary-inverse-fade: color-mix(
+    in srgb,
+    var(--primary-inverse) 80%,
+    white 30%
+  );
+  --color-4-inverse-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--primary\<deleted\|variable-09c6bc4d-c8c2-95a1-0d0c-01b4bb79d435\>
+      )
+      80%,
+    white 20%
+  );
+  --color-5-inverse-fade: color-mix(
+    in srgb,
+    var(--color-5-inverse) 90%,
+    white 10%
+  );
+  --color-6-inverse-fade: color-mix(
+    in srgb,
+    var(--color-6-inverse) 80%,
+    white 20%
+  );
+  --color-7-inverse-fade: color-mix(
+    in srgb,
+    var(
+        --color-dark--color-4\<deleted\|variable-4622ba0e-4098-2ec4-f78e-430f950a8964\>
+      )
+      85%,
+    black 15%
+  );
+  --color-9-inverse-fade: color-mix(
+    in srgb,
+    var(--color-9-inverse) 80%,
+    white 20%
+  );
+  --color-8-inverse-fade: color-mix(
+    in srgb,
+    var(--color-8-inverse) 80%,
+    white 20%
+  );
+  --transparent: transparent;
+  --nav-link-light: var(--light-1);
+  --nav-link-dark: var(--dark-1);
+  --link-font-color: #00a6b6;
+  --input-light--font-color: var(--dark-1);
+  --input-light--placeholder-font-color: #71c9c5;
+  --input-light--bg-color: var(--light-1);
+  --input-light--bg-color-hover: white;
+  --input-light--border-color: #71c9c5;
+  --input-light--border-color-hover: #047c97;
+  --input-dark--font-color: var(--light-1);
+  --input-dark--placeholder-font-color: var(--primary-inverse);
+  --input-dark--bg-color: var(--dark-1);
+  --input-dark--bg-color-hover: var(--shade--primary-l200);
+  --input-dark--border-color: var(--dark-1);
+  --input-dark--border-color-hover: var(--primary-inverse);
+  --shade--primary-l400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      65.61%,
+    white
+  );
+  --shade--primary-l300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      72.9%,
+    white
+  );
+  --shade--primary-l200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      81%,
+    white
+  );
+  --shade--primary-l100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      90%,
+    white
+  );
+  --shade--primary-d100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      90%,
+    black
+  );
+  --shade--primary-d200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      81%,
+    black
+  );
+  --shade--primary-d300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      70%,
+    black
+  );
+  --shade--primary-d400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>
+      )
+      60%,
+    black
+  );
+  --shade--color-2-l400: color-mix(in srgb, var(--color-2) 60%, white 40%);
+  --shade--color-2-l300: color-mix(in srgb, var(--color-2) 70%, white 30%);
+  --shade--color-2-l200: color-mix(in srgb, var(--color-2) 80%, white 20%);
+  --shade--color-2-l100: color-mix(in srgb, var(--color-2) 90%, white 10%);
+  --shade--color-2-d100: color-mix(in srgb, var(--color-2) 80%, black 20%);
+  --shade--color-2-d200: color-mix(in srgb, var(--color-2) 80%, black 20%);
+  --shade--color-2-d300: color-mix(in srgb, var(--color-2) 70%, black 30%);
+  --shade--color-2-d400: color-mix(in srgb, var(--color-2) 60%, black 40%);
+  --shade--color-4-l400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      60%,
+    white 40%
+  );
+  --shade--color-4-l300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      70%,
+    white 30%
+  );
+  --shade--color-4-l200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      80%,
+    white 20%
+  );
+  --shade--color-4-l100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      90%,
+    white 10%
+  );
+  --shade--color-4-d100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      90%,
+    black 10%
+  );
+  --shade--color-4-d200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      80%,
+    black 20%
+  );
+  --shade--color-4-d300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      70%,
+    black 30%
+  );
+  --shade--color-4-d400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>
+      )
+      60%,
+    black 40%
+  );
+  --shade--color-5-l400: color-mix(in srgb, var(--color-5) 60%, white 40%);
+  --shade--color-5-l300: color-mix(in srgb, var(--color-5) 70%, white 30%);
+  --shade--color-5-l200: color-mix(in srgb, var(--color-5) 80%, white 20%);
+  --shade--color-5-l100: color-mix(in srgb, var(--color-5) 90%, white 10%);
+  --shade--color-5-d100: color-mix(in srgb, var(--color-5) 90%, black 10%);
+  --shade--color-5-d200: color-mix(in srgb, var(--color-5) 80%, black 20%);
+  --shade--color-5-d300: color-mix(in srgb, var(--color-5) 70%, black 30%);
+  --shade--color-5-d400: color-mix(in srgb, var(--color-5) 60%, black 40%);
+  --shade--color-6-l300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      70%,
+    white 30%
+  );
+  --shade--color-6-l100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      90%,
+    white 10%
+  );
+  --shade--color-6-l400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      80%,
+    white 40%
+  );
+  --shade--color-6-l200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      80%,
+    white 20%
+  );
+  --shade--color-6-d100: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      90%,
+    black 10%
+  );
+  --shade--color-6-d200: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      80%,
+    black 20%
+  );
+  --shade--color-6-d300: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      70%,
+    black 30%
+  );
+  --shade--color-6-d400: color-mix(
+    in srgb,
+    var(
+        --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>
+      )
+      80%,
+    black 40%
+  );
+  --shade--color-7-d400: color-mix(in srgb, var(--color-7) 60%, black 40%);
+  --shade--color-7-d300: color-mix(in srgb, var(--color-7) 70%, black 30%);
+  --shade--color-7-d200: color-mix(in srgb, var(--color-7) 80%, black 20%);
+  --shade--color-7-d100: color-mix(in srgb, var(--color-7) 90%, black 10%);
+  --shade--color-7-l100: color-mix(in srgb, var(--color-7) 90%, white 10%);
+  --shade--color-7-l200: color-mix(in srgb, var(--color-7) 80%, white 20%);
+  --shade--color-7-l300: color-mix(in srgb, var(--color-7) 70%, white 30%);
+  --shade--color-7-l400: color-mix(in srgb, var(--color-7) 60%, white 40%);
+  --shade--color-8-l400: color-mix(in srgb, var(--color-8) 60%, white 40%);
+  --shade--color-8-l300: color-mix(in srgb, var(--color-8) 70%, white 30%);
+  --shade--color-8-l200: color-mix(in srgb, var(--color-8) 80%, white 20%);
+  --shade--color-8-l100: color-mix(in srgb, var(--color-8) 90%, white 10%);
+  --shade--color-8-d100: color-mix(in srgb, var(--color-8) 90%, black 10%);
+  --shade--color-8-d200: color-mix(in srgb, var(--color-8) 80%, black 20%);
+  --shade--color-8-d300: color-mix(in srgb, var(--color-8) 70%, black 30%);
+  --shade--color-8-d400: color-mix(in srgb, var(--color-8) 60%, black 40%);
+  --shade--grey-l700: color-mix(in srgb, var(--grey-1) 90%, white 10%);
+  --shade--grey-l600: color-mix(in srgb, var(--grey-1) 70%, white 30%);
+  --shade--grey-l500: var(--grey-1);
+  --shade--grey-l400: color-mix(in srgb, var(--grey-1) 90%, black 10%);
+  --shade--grey-l300: color-mix(in srgb, var(--grey-1) 80%, black 20%);
+  --shade--grey-l200: color-mix(in srgb, var(--grey-1) 70%, black 30%);
+  --shade--grey-l100: #585858;
+  --shade--grey-d100: var(--grey-2);
+  --shade--grey-d200: #4d4d4d;
+  --shade--grey-d300: #434343;
+  --shade--grey-d400: #383838;
+  --shade--grey-d500: #2c2c2c;
+  --shade--grey-d600: #292929;
+  --shade--grey-d700: #272727;
+  --shade--grey-d800: #252525;
+  --filter--light-invert: 99;
+  --filter--light-sepia: 49;
+  --filter--light-saturate: 197;
+  --filter--light-hue-rotate: 239;
+  --filter--light-brightness: 113;
+  --filter--light-contrast: 96;
+  --filter--primary-invert: 17;
+  --filter--primary-sepia: 24;
+  --filter--primary-saturate: 2415;
+  --filter--primary-hue-rotate: 185;
+  --filter--primary-brightness: 103;
+  --filter--primary-contrast: 98;
+  --filter--color-1-invert: 26;
+  --filter--color-1-sepia: 80;
+  --filter--color-1-saturate: 2128;
+  --filter--color-1-hue-rotate: 169;
+  --filter--color-1-brightness: 93;
+  --filter--color-1-contrast: 97;
+  --filter--color-2-invert: 60;
+  --filter--color-2-sepia: 83;
+  --filter--color-2-saturate: 5082;
+  --filter--color-2-hue-rotate: 155;
+  --filter--color-2-brightness: 97;
+  --filter--color-2-contrast: 101;
+  --filter--color-3-invert: 81;
+  --filter--color-3-sepia: 41;
+  --filter--color-3-saturate: 374;
+  --filter--color-3-hue-rotate: 123;
+  --filter--color-3-brightness: 84;
+  --filter--color-3-contrast: 92;
+  --filter--color-4-invert: 90;
+  --filter--color-4-sepia: 15;
+  --filter--color-4-hue-rotate: 162;
+  --filter--color-4-saturate: 576;
+  --filter--color-4-brightness: 92;
+  --filter--color-4-contrast: 89;
+  --filter--color-5-invert: 95;
+  --filter--color-5-sepia: 17;
+  --filter--color-5-saturate: 4211;
+  --filter--color-5-hue-rotate: 309;
+  --filter--color-5-brightness: 113;
+  --filter--color-5-contrast: 96;
+  --filter--color-6-invert: 64;
+  --filter--color-6-sepia: 13;
+  --filter--color-6-saturate: 3377;
+  --filter--color-6-hue-rotate: 323;
+  --filter--color-6-brightness: 99;
+  --filter--color-6-contrast: 92;
+  --filter--color-7-invert: 53;
+  --filter--color-7-sepia: 85;
+  --filter--color-7-saturate: 4480;
+  --filter--color-7-hue-rotate: 335;
+  --filter--color-7-brightness: 94;
+  --filter--color-7-contrast: 86;
+  --filter--color-8-invert: 34;
+  --filter--color-8-sepia: 17;
+  --filter--color-8-saturate: 1564;
+  --filter--color-8-hue-rotate: 277;
+  --filter--color-8-brightness: 92;
+  --filter--color-8-contrast: 89;
+  --filter--color-9-invert: 99;
+  --filter--color-9-saturate: 551;
+  --filter--color-9-brightness: 99;
+  --filter--color-9-sepia: 2;
+  --filter--color-9-contrast: 95;
+  --filter--color-9-hue-rotate: 144;
+  --btn-padding-top: 1.25rem;
+  --btn-padding-bottom: 1.25rem;
+  --btn-padding-left: 1.15rem;
+  --btn-padding-right: 1.15rem;
+  --btn-font: Khand, Impact, sans-serif;
+  --btn-font-weight: 700;
+  --btn-font-size: 1rem;
+  --btn-letter-spacing: 0.05em;
+  --btn-line-height: 1;
+  --btn-border-width: 3px;
+  --label-padding-top: 0.25em;
+  --label-padding-bottom: 0.25em;
+  --label-padding-right: 0.3em;
+  --label-letter-spacing: 0.055em;
+  --label-line-height: 1;
+  --btn-lg-weight: 400;
+  --btn-lg-radius: 2.25px;
+  --btn-lg-padding-bottom: 1.5rem;
+  --btn-lg-weight-hover: 400;
+  --btn-lg-padding-right: 2rem;
+  --btn-lg-padding-left: 2rem;
+  --btn-lg-border-width: 3px;
+  --btn-lg-padding-top: 1.5rem;
+  --btn-lg-text-size: 1.15rem;
+  --btn-sm-padding-top: 1rem;
+  --btn-sm-padding-bottom: 1rem;
+  --btn-sm-padding-left: 1rem;
+  --btn-sm-padding-right: 1rem;
+  --btn-sm-text-size: 0.85rem;
+  --btn-sm-border-width: 2px;
+  --btn-sm-weight: 400;
+  --btn-sm-radius: 1.25px;
+  --tag-font-weight: 650;
+  --tag-line-height: 1;
+  --primary-mertic-font-weight: 500;
+  --color-dark--primary\<deleted\|variable-09c6bc4d-c8c2-95a1-0d0c-01b4bb79d435\>: var(
+    --primary
+  );
+  --color-dark--color-1\<deleted\|variable-bd1c1520-c269-e8a6-dc21-a7bbd79495ae\>: var(
+    --color-1
+  );
+  --color-dark--color-2\<deleted\|variable-4a8b2c3d-96f6-6cca-9c50-cf2009b6a387\>: var(
+    --color-2
+  );
+  --color-dark--color-3\<deleted\|variable-e3a87203-6704-a571-43fb-262e8c7ffd9c\>: var(
+    --color-3
+  );
+  --color-dark--color-4\<deleted\|variable-4622ba0e-4098-2ec4-f78e-430f950a8964\>: var(
+    --color-4
+  );
+  --color-dark--color-5\<deleted\|variable-660bd154-9600-0c78-f857-27500023e382\>: var(
+    --color-5
+  );
+  --color-dark--color-6\<deleted\|variable-c41db252-43e1-d3d5-9afa-7643f2725142\>: var(
+    --color-6
+  );
+  --color-dark--color-7\<deleted\|variable-25603a0e-7322-3365-85e4-5e485c0e0bba\>: var(
+    --color-7
+  );
+  --_shades-2---brand-color-primary--primary\<deleted\|variable-398e8135-00ce-cd6d-3380-2477e8b89331\>: #163666;
+  --_shades-2---shades-brand-color-4--brightblue\<deleted\|variable-feb84725-4074-87ca-bcca-f2d5edf4612f\>: #b2d3de;
+  --_shades-2---shades-color-2--color-6\<deleted\|variable-eee98096-9949-4644-5c7e-1c3c0b63a243\>: #f37d59;
+}

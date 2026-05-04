@@ -1,4 +1,5 @@
 
+
 import {defineConfig} from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
@@ -91,6 +92,9 @@ export default defineConfig({
       tailwindcss(), 
       patchViteErrorOverlay()
     ],
+    ssr: {
+      external: ['path', 'http', 'https', 'url', 'stream', 'fs', 'os', 'crypto', 'buffer', 'util', 'events']
+    },
     server: {
       watch: {
         usePolling: true, // Enable polling for file watching in Docker
@@ -116,4 +120,5 @@ export default defineConfig({
     },
   },
 });
+
 

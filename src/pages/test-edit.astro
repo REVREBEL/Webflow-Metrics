@@ -1,0 +1,42 @@
+---
+import MainLayout from '../layouts/main.astro';
+---
+
+<MainLayout>
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4">Edit Test</h1>
+    <div id="root"></div>
+    
+    <script>
+      console.log('🔵 Page loaded');
+      
+      // Test if React is working
+      const rootEl = document.getElementById('root');
+      if (rootEl) {
+        rootEl.innerHTML = '<p>Page is working. Open console to see logs.</p>';
+      }
+      
+      // Test the edit functionality
+      const template = {
+        id: 1,
+        template_name: 'Test Template',
+        metric_name: 'Test Metric',
+        table_id: 1,
+        select_columns: 'col1,col2',
+        value_column: 'value',
+        format_type: 'number'
+      };
+      
+      console.log('🔵 Test template:', template);
+      console.log('🔵 Trying split:', template.select_columns?.split(','));
+      
+      // Simulate what handleEdit does
+      try {
+        const selectColumns = template.select_columns ? template.select_columns.split(',').map(c => c.trim()) : ['*'];
+        console.log('✅ Split successful:', selectColumns);
+      } catch (error) {
+        console.error('❌ Split failed:', error);
+      }
+    </script>
+  </div>
+</MainLayout>

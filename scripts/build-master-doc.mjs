@@ -101,18 +101,6 @@ async function main() {
   console.log(`✅ Wrote docs/MASTER_GUIDE.md with ${ordered.length} sections.`);
 }
 
-for (const filename of ordered) {
-  const srcPath = path.join(ROOT, filename);
-  const destPath = path.join(ARCHIVE_DIR, filename);
-  try {
-    await fs.rename(srcPath, destPath);
-    console.log(`📁 Moved ${filename} → docs/archive/`);
-  } catch (err) {
-    console.error(`❌ Failed to move ${filename}:`, err);
-  }
-}
-
-
 main().catch((err) => {
   console.error("❌ Error building master doc:", err);
   process.exit(1);

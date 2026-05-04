@@ -173,6 +173,7 @@ export const POST: APIRoute = async ({ locals }) => {
         aggregation_type TEXT,
         aggregation_column TEXT,
         group_by_columns TEXT,
+        group_by_function TEXT,
         filters TEXT,
         custom_sql TEXT,
         use_custom_sql INTEGER DEFAULT 0,
@@ -325,6 +326,7 @@ export const OPTIONS: APIRoute = async () => {
     },
   });
 };
+
 
 
 

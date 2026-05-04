@@ -14,9 +14,10 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_C
 */
 
 :root {
-  --_apps---typography--heading-font: Khand, Impact, sans-serif;
-  --_apps---typography--body-font: 'General Sans', Tahoma, sans-serif;
-  --_apps---typography--button-font: Khand, Impact, sans-serif;
+  --_apps---font--headline: Khand, Impact, sans-serif;
+  --_apps---font--body: 'General Sans', Tahoma, sans-serif;
+  --_apps---font--button: Khand, Impact, sans-serif;
+  --_apps---font--metrics: Arial, 'Helvetica Neue', Helvetica, sans-serif;
   --_apps---sizes--radius: 0.25rem;
   --_apps---colors--background: #eff5f6;
   --_apps---colors--foreground: #163666;
@@ -72,6 +73,8 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_C
   --_apps---charts--chart-3-dark: color-mix(in srgb, #e05047 80%, white 20%);
   --_apps---charts--chart-4-dark: #8e456a;
   --_apps---charts--chart-5-dark: #b2d3de;
+  --_apps---charts--positive: #71c9c5;
+  --_apps---charts--negative: #e05047;
   --_apps---sidebar--sidebar-dark: #163666;
   --_apps---sidebar--sidebar-foreground-dark: #b2d3de;
   --_apps---sidebar--sidebar-primary-dark: #047c97;
@@ -80,4 +83,10 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_C
   --_apps---sidebar--sidebar-accent-foreground-dark: #b2d3de;
   --_apps---sidebar--sidebar-border-dark: color-mix(in srgb, #163666 60%, white 40%);
   --_apps---sidebar--sidebar-ring-dark: #71c9c5;
+  --_apps---metrics--total-inverse: #b2d3de;
+  --_apps---metrics--total: #163666;
+  --_apps---metrics--transient: #e05047;
+  --_apps---metrics--transient-inverse: #faca78;
+  --_apps---metrics--group: #047c97;
+  --_apps---metrics--group-inverse: #71c9c5;
 }

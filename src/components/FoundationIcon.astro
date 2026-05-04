@@ -1,0 +1,49 @@
+---
+interface Props {
+  name: string;
+  class?: string;
+  size?: string | number;
+}
+
+const { name, class: className, size } = Astro.props;
+
+// Step 1: Grab all SVGs in the folder
+const icons = import.meta.glob('/src/icons/foundation/*.svg', { 
+  query: '?raw', 
+  import: 'default', 
+  eager: true 
+});
+
+// Step 2: Normalize the name. 
+// This ensures that whether you pass "flipboard" or "fi-flipboard", 
+// it finds the file.
+const normalizedName = name.startsWith('fi-') ? name : `fi-${name}`;
+const iconPath = `/src/icons/foundation/${normalizedName}.svg`;
+
+// Step 3: Check the exact key
+let innerHTML = icons[iconPath] as string;
+
+// Fallback: If it's one of the ones without "fi-" (like caret-up)
+if (!innerHTML) {
+  const fallbackPath = `/src/icons/foundation/${name}.svg`;
+  innerHTML = icons[fallbackPath] as string;
+}
+
+const customSize = size ? (typeof size === 'number' ? `${size}px` : size) : '1em';
+---
+
+{innerHTML ? (
+  <span class={className} style={`font-size: ${customSize};`} set:html={innerHTML} />
+) : (
+  <span class="text-xs text-red-500 border border-dotted">Missing: {name}</span>
+)}
+
+<style>
+  span :global(svg) {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>

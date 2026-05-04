@@ -1,3 +1,19 @@
+/**
+ * @deprecated This in-memory cache is no longer used.
+ * 
+ * Caching is now handled by D1 database (metric_cache table).
+ * See:
+ * - /api/admin/refresh-cache - Populate cache from BigQuery
+ * - /api/client/metrics - Read from cache (falls back to BigQuery if cache miss)
+ * - /api/admin/clear-cache - Clear all cached data
+ * 
+ * Benefits of D1 cache:
+ * - Persistent across worker restarts
+ * - Shared across all worker instances
+ * - Supports calculated metrics (e.g., ADR = revenue / rooms)
+ * - Expires at 7am PST daily (aligned with data processing)
+ */
+
 // Cache manager with 24-hour TTL and 7am PST reset point
 // Data is processed once daily at 6am, so we cache until 7am the next day
 
@@ -169,3 +185,4 @@ class CacheManager {
 }
 
 export const cacheManager = new CacheManager();
+

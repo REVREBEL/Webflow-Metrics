@@ -79,6 +79,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       aggregation_type?: string;
       aggregation_column?: string;
       group_by_columns?: string;
+      group_by_function?: string;
       filters?: string;
     };
 
@@ -92,6 +93,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       aggregation_type,
       aggregation_column,
       group_by_columns,
+      group_by_function,
       filters,
     } = body;
 
@@ -122,9 +124,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
         `INSERT INTO query_templates_v2 (
           template_name, metric_name, table_id, description,
           use_custom_sql, custom_sql,
-          aggregation_type, aggregation_column, group_by_columns, filters,
+          aggregation_type, aggregation_column, group_by_columns, group_by_function, filters,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
       )
       .bind(
         template_name,
@@ -136,6 +138,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         aggregation_type || null,
         aggregation_column || null,
         group_by_columns || null,
+        group_by_function || null,
         filters || null
       )
       .run();
@@ -186,6 +189,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       aggregation_type?: string;
       aggregation_column?: string;
       group_by_columns?: string;
+      group_by_function?: string;
       filters?: string;
     };
 
@@ -200,6 +204,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       aggregation_type,
       aggregation_column,
       group_by_columns,
+      group_by_function,
       filters,
     } = body;
 
@@ -237,6 +242,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
           aggregation_type = ?,
           aggregation_column = ?,
           group_by_columns = ?,
+          group_by_function = ?,
           filters = ?,
           updated_at = datetime('now')
         WHERE id = ?`
@@ -251,6 +257,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
         aggregation_type || null,
         aggregation_column || null,
         group_by_columns || null,
+        group_by_function || null,
         filters || null,
         template_id
       )
@@ -325,5 +332,9 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+
+
+
 
 

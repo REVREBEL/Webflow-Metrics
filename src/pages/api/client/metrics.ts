@@ -25,8 +25,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       hotel_code: string;
       year: number;
       month: number;
+      force_refresh?: boolean;
     };
-    const { hotel_code, year, month } = body;
+    const { hotel_code, year, month, force_refresh } = body;
 
     if (!hotel_code || !year || !month) {
       return new Response(
@@ -35,101 +36,81 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // Fetch hotel configuration
-    const hotel = await db
-      .prepare('SELECT * FROM hotels WHERE hotel_code = ?')
-      .bind(hotel_code)
-      .first() as any;
+    const nowTimestamp = Math.floor(Date.now() / 1000);
 
-    if (!hotel) {
-      return new Response(
-        JSON.stringify({ error: 'Hotel not found' }),
-        { status: 404, headers }
-      );
+    // Check if cache table exists
+    let cacheTableExists = false;
+    try {
+      await db.prepare('SELECT 1 FROM metric_cache LIMIT 1').all();
+      cacheTableExists = true;
+    } catch (e) {
+      console.log('[Cache] Cache table does not exist yet');
     }
 
-    // Fetch all global query templates
-    const templates = await db
-      .prepare('SELECT * FROM global_query_templates ORDER BY template_name')
-      .all();
-
-    if (!templates.results || templates.results.length === 0) {
+    if (!cacheTableExists) {
       return new Response(
-        JSON.stringify({ metrics: [] }),
+        JSON.stringify({ 
+          metrics: [],
+          error: 'Cache not initialized. Please run cache migration in Admin Panel → Cache tab.',
+          requiresMigration: true
+        }),
         { status: 200, headers }
       );
     }
 
-    // Decrypt service account JSON
-    const serviceAccountJson = await decrypt(hotel.service_account_json, env);
-    const credentials = JSON.parse(serviceAccountJson);
+    // Check cache first (unless force_refresh is true)
+    if (!force_refresh) {
+      const cachedMetrics = await db
+        .prepare(`
+          SELECT metric_name, value, cached_at, expires_at
+          FROM metric_cache
+          WHERE hotel_code = ? 
+            AND year = ? 
+            AND month = ?
+            AND expires_at > ?
+          ORDER BY metric_name
+        `)
+        .bind(hotel_code, year, month, nowTimestamp)
+        .all();
 
-    // Initialize BigQuery client
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials,
-      location: hotel.data_location || 'US',
-    });
-
-    // Calculate date range
-    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-    const lastDay = new Date(year, month, 0).getDate();
-    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-
-    // Execute all queries
-    const metricPromises = (templates.results as any[]).map(async (template) => {
-      try {
-        // Replace placeholders in the query
-        let query = template.sql_query
-          .replace(/\{\{hotel_code\}\}/g, hotel_code)
-          .replace(/\{\{project_id\}\}/g, hotel.project_id)
-          .replace(/\{\{dataset_id\}\}/g, hotel.dataset_id || '')
-          .replace(/\{\{table_id\}\}/g, hotel.table_id || '')
-          .replace(/\{\{start_date\}\}/g, startDate)
-          .replace(/\{\{end_date\}\}/g, endDate)
-          .replace(/\{\{year\}\}/g, String(year))
-          .replace(/\{\{month\}\}/g, String(month));
-
-        // Execute query
-        const [rows] = await bigquery.query({ query });
-
-        // Extract the first row's first value
-        let value = null;
-        if (rows && rows.length > 0) {
-          const firstRow = rows[0];
-          // Get the first column value
-          const keys = Object.keys(firstRow);
-          if (keys.length > 0) {
-            value = firstRow[keys[0]];
-          }
-        }
-
-        return {
-          metric_name: template.metric_name,
-          value,
+      if (cachedMetrics.results && cachedMetrics.results.length > 0) {
+        console.log(`[Cache] Serving ${cachedMetrics.results.length} metrics from cache for ${hotel_code}`);
+        
+        const metrics = (cachedMetrics.results as any[]).map(m => ({
+          metric_name: m.metric_name,
+          value: m.value,
           success: true,
-        };
-      } catch (error: any) {
-        console.error(`Error executing query for ${template.metric_name}:`, error);
-        return {
-          metric_name: template.metric_name,
-          value: null,
-          success: false,
-          error: error.message,
-        };
+          cached: true,
+          cached_at: m.cached_at,
+          expires_at: m.expires_at
+        }));
+
+        return new Response(
+          JSON.stringify({ metrics }),
+          { status: 200, headers }
+        );
       }
-    });
+    }
 
-    const metrics = await Promise.all(metricPromises);
-
+    // Cache miss - return empty with helpful message
+    console.log(`[Cache] Cache miss for ${hotel_code} ${year}-${month}`);
+    
     return new Response(
-      JSON.stringify({ metrics }),
+      JSON.stringify({ 
+        metrics: [],
+        message: 'No cached data found. Please refresh cache in Admin Panel → Cache tab.',
+        requiresRefresh: true
+      }),
       { status: 200, headers }
     );
+
   } catch (error: any) {
     console.error('Error fetching metrics:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        metrics: [],
+        error: error.message 
+      }),
       { status: 500, headers }
     );
   }
@@ -141,3 +122,14 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,9 @@
+
+
 ---
 import '../../generated/fonts.css';
 import '../styles/global.css';
-// import '../site-components/global.css'; // Temporarily disabled - needs Webflow regeneration
+import '../site-components/global.css'; // REQUIRED for Webflow components
 
 const { pageClass = '' } = Astro.props;
 ---
@@ -17,7 +19,7 @@ const { pageClass = '' } = Astro.props;
 <link rel="stylesheet" href="/css/webflow-components.css" />
 </head>
 <!-- Dark mode class injection point - will be replaced with `dark` class based on your site palette -->
-<body class="__DARK_MODE_CLASS__">
+<body class="">
 <slot />
 </body>
 </html>
@@ -34,3 +36,5 @@ padding-left: 0 !important;
 margin: 0 !important; 
 }
 </style>
+
+

@@ -11,8 +11,10 @@
     "setup:repo": "bash scripts/setup-repo.sh",
     "cf-typegen": "wrangler types",
     "build:push": "bash scripts/build-and-push.sh",
+    "create:pr": "bash scripts/create-pr.sh",
     "build:docs": "node ./scripts/build-master-doc.mjs",
-    "cleanup": "rm -rf /tmp/* /var/tmp/* /root/.npm /root/.cache /root/.local /app/lost+found/* /app/dist 2>/dev/null || true && echo 'Cleanup complete!' && df -h / | tail -1"
+    "cleanup": "rm -rf /tmp/* /var/tmp/* /root/.npm /root/.cache /root/.local /app/lost+found/* /app/dist 2>/dev/null || true && echo 'Cleanup complete!' && df -h / | tail -1",
+    "sync:main": "bash scripts/sync-main-to-dev.sh"
   },
   "dependencies": {
     "@astrojs/cloudflare": "12.6.7",
@@ -50,6 +52,7 @@
     "@types/react-dom": "19.1.7",
     "apache-arrow": "21.1.0",
     "astro": "5.13.5",
+    "astro-icon": "1.1.5",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",

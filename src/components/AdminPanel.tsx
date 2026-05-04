@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { baseUrl } from '../lib/base-url';
 import { QueryBuilder } from './QueryBuilder';
 import { TableRegistry } from './TableRegistry';
+import { MigrationManager } from './MigrationManager';
 
 interface Hotel {
   id?: number;
@@ -40,6 +42,9 @@ export function AdminPanel() {
   const [success, setSuccess] = useState<string | null>(null);
   const [dbInitialized, setDbInitialized] = useState<boolean | null>(null);
   const [initializingDb, setInitializingDb] = useState(false);
+  const [activeTab, setActiveTab] = useState('hotels');
+  const [clearingCache, setClearingCache] = useState(false);
+  const [cacheMessage, setCacheMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     hotel_code: '',
@@ -228,6 +233,30 @@ export function AdminPanel() {
     }
   };
 
+  const clearCache = async () => {
+    setClearingCache(true);
+    setCacheMessage(null);
+    
+    try {
+      const response = await fetch(`${baseUrl}/api/bigquery/clear-cache`, {
+        method: 'POST',
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setCacheMessage('Cache cleared successfully!');
+      } else {
+        setCacheMessage(`Error: ${data.error || 'Failed to clear cache'}`);
+      }
+    } catch (err: any) {
+      setCacheMessage(`Error: ${err.message}`);
+    } finally {
+      setClearingCache(false);
+      setTimeout(() => setCacheMessage(null), 5000);
+    }
+  };
+
   const handleEditHotel = (hotel: Hotel) => {
     setFormData({
       hotel_code: hotel.hotel_code,
@@ -311,9 +340,11 @@ export function AdminPanel() {
       )}
 
       <Tabs defaultValue="hotels" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="query-builder">Query Builder</TabsTrigger>
           <TabsTrigger value="table-registry">Table Registry</TabsTrigger>
+          <TabsTrigger value="migrations">Migrations</TabsTrigger>
+          <TabsTrigger value="cache">Cache</TabsTrigger>
           <TabsTrigger value="hotels">Hotels</TabsTrigger>
         </TabsList>
 
@@ -325,123 +356,148 @@ export function AdminPanel() {
           <TableRegistry />
         </TabsContent>
 
-        <TabsContent value="templates" className="space-y-6">
+        <TabsContent value="migrations" className="space-y-6">
+          <MigrationManager />
+        </TabsContent>
+
+        <TabsContent value="cache" className="space-y-6">
+          {/* Cache Migration */}
           <Card>
             <CardHeader>
-              <CardTitle>Global Query Templates</CardTitle>
+              <CardTitle>Cache Migration</CardTitle>
               <CardDescription>
-                Create universal query templates that work for all hotels. Use placeholders like {'{'}
-                {'{'}hotel_code{'}'}{'}'},  {'{'}{'{'}project_id{'}'}{'}'},  {'{'}{'{'}start_date{'}'}{'}'},  {'{'}{'{'}end_date{'}'}{'}'}, etc.
+                Run this once to create the cache and calculations tables
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Add Template Form */}
-              <form onSubmit={handleTemplateSubmit} className="space-y-4 border p-4 rounded-lg bg-muted/30">
-                <h3 className="font-semibold">Add New Query Template</h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="template_name">Template Name *</Label>
-                    <Input
-                      id="template_name"
-                      placeholder="total_bookings"
-                      value={templateFormData.template_name}
-                      onChange={(e) => setTemplateFormData({ ...templateFormData, template_name: e.target.value })}
-                      required
-                    />
-                  </div>
+            <CardContent>
+              <Button
+                onClick={async () => {
+                  setError(null);
+                  setSuccess(null);
+                  try {
+                    const response = await fetch(`${baseUrl}/api/admin/migrate-cache`, {
+                      method: 'POST'
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                      setSuccess('Cache migration completed successfully!');
+                    } else {
+                      setError(data.error || 'Migration failed');
+                    }
+                  } catch (err: any) {
+                    setError(err.message);
+                  }
+                }}
+              >
+                Run Cache Migration
+              </Button>
+            </CardContent>
+          </Card>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="metric_name">Display Name *</Label>
-                    <Input
-                      id="metric_name"
-                      placeholder="Total Bookings"
-                      value={templateFormData.metric_name}
-                      onChange={(e) => setTemplateFormData({ ...templateFormData, metric_name: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    placeholder="Count of all bookings for the selected period"
-                    value={templateFormData.description}
-                    onChange={(e) => setTemplateFormData({ ...templateFormData, description: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sql_query">SQL Query Template *</Label>
-                  <Textarea
-                    id="sql_query"
-                    placeholder={`SELECT COUNT(*) as total\nFROM \`{{project_id}}.{{dataset_id}}.bookings\`\nWHERE hotel_code = '{{hotel_code}}'\n  AND date BETWEEN '{{start_date}}' AND '{{end_date}}'`}
-                    value={templateFormData.sql_query}
-                    onChange={(e) => setTemplateFormData({ ...templateFormData, sql_query: e.target.value })}
-                    rows={12}
-                    className="font-mono text-sm"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Available placeholders: {'{'}{'{'}hotel_code{'}'}{'}'},  {'{'}{'{'}project_id{'}'}{'}'},  {'{'}{'{'}dataset_id{'}'}{'}'},  {'{'}{'{'}table_id{'}'}{'}'},  {'{'}{'{'}start_date{'}'}{'}'},  {'{'}{'{'}end_date{'}'}{'}'},  {'{'}{'{'}year{'}'}{'}'},  {'{'}{'{'}month{'}'}{'}'} 
-                  </p>
-                </div>
-
-                <Button type="submit" className="w-full">
-                  Save Query Template
-                </Button>
-              </form>
-
-              {/* Templates List */}
-              <div>
-                <h3 className="font-semibold mb-4">
-                  Configured Templates ({templates.length})
-                </h3>
-                
-                {templates.length === 0 ? (
-                  <p className="text-center py-8 text-muted-foreground border rounded-lg">
-                    No templates configured yet. Add your first template above.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {templates.map((template) => (
-                      <div 
-                        key={template.id}
-                        className="p-4 border rounded-lg hover:bg-muted/50"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h4 className="font-semibold">{template.metric_name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Template: {template.template_name}
-                            </p>
-                            {template.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {template.description}
-                              </p>
-                            )}
-                          </div>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleTemplateDelete(template.id!)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                        <pre className="text-xs bg-muted p-3 rounded overflow-x-auto mt-3">
-                          {template.sql_query}
-                        </pre>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Updated: {new Date(template.updated_at || template.created_at || Date.now()).toLocaleDateString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {/* Cache Refresh */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Refresh Cache</CardTitle>
+              <CardDescription>
+                Query BigQuery and populate the cache with fresh data. Runs calculations automatically.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  This will execute all query templates for all hotels and cache the results in the D1 database.
+                  Calculated metrics (like ADR) will be automatically computed and cached as well.
+                </p>
+                <p className="text-sm text-muted-foreground font-semibold">
+                  Cache expires at 7am PST daily (aligned with your data processing schedule).
+                </p>
               </div>
+              <Button
+                onClick={async () => {
+                  setClearingCache(true);
+                  setCacheMessage(null);
+                  setError(null);
+                  setSuccess(null);
+                  try {
+                    const response = await fetch(`${baseUrl}/api/admin/refresh-cache`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({})
+                    });
+                    
+                    // Try to parse response as JSON
+                    let data;
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                      data = await response.json();
+                    } else {
+                      // If not JSON, read as text
+                      const text = await response.text();
+                      setError(`Server error: ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}`);
+                      setClearingCache(false);
+                      return;
+                    }
+                    
+                    if (response.ok) {
+                      setSuccess(
+                        `Cache refreshed! Cached ${data.cached} metrics, calculated ${data.calculated} metrics across ${data.hotels} hotel(s).`
+                      );
+                      if (data.errors && data.errors.length > 0) {
+                        setCacheMessage(`Errors: ${data.errors.join(', ')}`);
+                      }
+                    } else {
+                      setError(data.error || 'Failed to refresh cache');
+                    }
+                  } catch (err: any) {
+                    setError(`Cache refresh failed: ${err.message}`);
+                  } finally {
+                    setClearingCache(false);
+                  }
+                }}
+                disabled={clearingCache}
+              >
+                {clearingCache ? 'Refreshing...' : 'Refresh Cache for All Hotels'}
+              </Button>
+              {cacheMessage && (
+                <Alert className="mt-4">
+                  <AlertDescription>{cacheMessage}</AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Clear Cache */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Clear Cache</CardTitle>
+              <CardDescription>
+                Remove all cached data from the database
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={async () => {
+                  if (!confirm('Are you sure you want to clear all cached data?')) return;
+                  setError(null);
+                  setSuccess(null);
+                  try {
+                    const response = await fetch(`${baseUrl}/api/admin/clear-cache`, {
+                      method: 'POST'
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                      setSuccess('Cache cleared successfully!');
+                    } else {
+                      setError(data.error || 'Failed to clear cache');
+                    }
+                  } catch (err: any) {
+                    setError(err.message);
+                  }
+                }}
+                variant="destructive"
+              >
+                Clear All Cache
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -653,6 +709,11 @@ export function AdminPanel() {
     </div>
   );
 }
+
+
+
+
+
 
 
 

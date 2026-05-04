@@ -54,6 +54,18 @@ export function ClientDashboard() {
       .then(res => res.json())
       .then(data => {
         setMetrics(data.metrics || []);
+        
+        // Handle cache-specific messages
+        if (data.requiresMigration) {
+          setError('⚠️ Cache not initialized. Go to Admin Panel → Cache tab → Run Cache Migration');
+        } else if (data.requiresRefresh) {
+          setError('ℹ️ No cached data. Go to Admin Panel → Cache tab → Refresh Cache');
+        } else if (data.error) {
+          setError(data.error);
+        } else if (data.message) {
+          setError(data.message);
+        }
+        
         setLoading(false);
       })
       .catch(() => {
@@ -296,13 +308,43 @@ export function ClientDashboard() {
             borderRadius: '8px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
-            <p style={{ color: '#666' }}>
-              No metrics configured for this hotel. Add query templates in the Admin Panel.
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#163666' }}>
+              No Metrics Available
+            </h3>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+              To see metrics, you need to:
             </p>
+            <ol style={{ 
+              textAlign: 'left', 
+              maxWidth: '500px', 
+              margin: '0 auto 2rem',
+              color: '#666',
+              lineHeight: '1.8'
+            }}>
+              <li>Add query templates in Admin Panel → Query Builder</li>
+              <li>Run cache migration in Admin Panel → Cache tab</li>
+              <li>Refresh cache in Admin Panel → Cache tab</li>
+            </ol>
+            <a
+              href={`${baseUrl}/admin`}
+              style={{
+                display: 'inline-block',
+                padding: '0.75rem 1.5rem',
+                background: '#163666',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                fontWeight: '500'
+              }}
+            >
+              Go to Admin Panel
+            </a>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+
 

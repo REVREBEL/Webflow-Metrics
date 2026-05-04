@@ -4,6 +4,7 @@
 ---
 import MainLayout from '../layouts/main.astro';
 import { baseUrl } from '../lib/base-url';
+import FoundationIcon from '../components/FoundationIcon.astro';
 ---
 
 <MainLayout>
@@ -27,11 +28,11 @@ import { baseUrl } from '../lib/base-url';
           class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
         >
           <div class="space-y-4">
-            <div class="text-4xl">📊</div>
-            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+            <FoundationIcon name="fi-graph-bar"  class="text-6xl text-primary" />
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
               Dashboard
             </h2>
-            <p class="text-muted-foreground">
+            <p class="text-muted-foreground text-primary">
               View real-time metrics and analytics for your hotels
             </p>
             <div class="flex items-center text-primary font-medium">
@@ -59,11 +60,12 @@ import { baseUrl } from '../lib/base-url';
           class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
         >
           <div class="space-y-4">
-            <div class="text-4xl">⚙️</div>
-            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+            <FoundationIcon name="fi-widget"  class="text-8xl text-primary" />
+  
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
               Admin Panel
             </h2>
-            <p class="text-muted-foreground">
+            <p class="text-muted-foreground text-primary">
               Configure hotels, credentials, and query templates
             </p>
             <div class="flex items-center text-primary font-medium">
@@ -91,11 +93,11 @@ import { baseUrl } from '../lib/base-url';
           class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
         >
           <div class="space-y-4">
-            <div class="text-4xl">🎨</div>
-            <h2 class="text-2xl font-bold font-heading group-hover:text-primary transition-colors">
+             <FoundationIcon name="fi-flipboard"  class="text-primary w-40 h-40" />
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
               Component Showcase
             </h2>
-            <p class="text-muted-foreground">
+            <p class="text-muted-foreground text-primary">
               View all available charts, stats cards, and UI components
             </p>
             <div class="flex items-center text-primary font-medium">

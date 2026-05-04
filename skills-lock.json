@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "skills": {
+    "astro": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "88e5967a26240b1ae697b466a51c7d5cb9eed45b06da50533b20971c8546363d"
+    },
+    "bigquery-analytics": {
+      "source": "trantuananh-17/product-reviews",
+      "sourceType": "github",
+      "computedHash": "3c84fb4c9b8ad4458ba20833379b1aa1e8043f61a4aaa3e4c658d29b1dc94329"
+    },
+    "bq-query-optimization": {
+      "source": "funnelenvy/agents_webinar_demos",
+      "sourceType": "github",
+      "computedHash": "795cff2d1e81cb8964267b2769e0c1d8c83e47d8d657c9a6ea2c308ce890cfac"
+    },
+    "bulk-cms-update": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "127d40f85d4e4d5538e05a9417bcf46776a6f0fdad8d0732323d8f59807e1fa7"
+    },
+    "cms-best-practices": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "c5593f08e4e1272401808809f58069f918ef297c16caef4514b32f983e39f33a"
+    },
+    "cms-collection-setup": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "c4c0b8d414a40394c3046ef3c2887ba0bb3a13eb2eb5fb69b40b1073954d3a8e"
+    },
+    "custom-code-management": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "97feefb90022699db5f7f3575f32f191db4dd6543e6487bb47cd011abd57468c"
+    },
+    "docs-components": {
+      "source": "reactjs/react.dev",
+      "sourceType": "github",
+      "computedHash": "6e63b48a4d90c7ee7410fd64758f80f0cd308cb35529cc83c62dbc6be5a75b17"
+    },
+    "docs-rsc-sandpack": {
+      "source": "reactjs/react.dev",
+      "sourceType": "github",
+      "computedHash": "4f176db575acf5ec28c03f43dbe57ab15dc1d670d6982013d4057dac1c305a05"
+    },
+    "docs-sandpack": {
+      "source": "reactjs/react.dev",
+      "sourceType": "github",
+      "computedHash": "ee27a57840bc95d56d200688c06c1f12a00e2ddc70fedaf354cb1f7ddc50ef8a"
+    },
+    "flowkit-naming": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "57768073859fdd7832e10b325a97475bfa78c9a460fcd2a54c6bbb1249e04e26"
+    },
+    "link-checker": {
+      "source": "webflow/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "ba565d655a365a19710c28a5d54b615f2e33d51ece271a6f0b17d59885d2d304"
+    },
+    "react-development": {
+      "source": "manutej/luxor-claude-marketplace",
+      "sourceType": "github",
+      "computedHash": "1dc30622754002b9ae16ee6db1edd36df14e8ff77839d033524a951994569425"
+    },
+    "react-expert": {
+      "source": "reactjs/react.dev",
+      "sourceType": "github",
+      "computedHash": "e53cc1a286987b7f28ba5cdd29e8ebacdde0d5822d40e938652fec8c47f33efa"
+    },
+    "webflow-code-components": {
+      "source": "224-industries/webflow-skills",
+      "sourceType": "github",
+      "computedHash": "93c78c8984ebbbee1acffe9c481271ac7d6d160c880ab42334eba7bf30f226ae"
+    },
+    "webflow-ui-skills": {
+      "source": "ihlamury/design-skills",
+      "sourceType": "github",
+      "computedHash": "9ef523b9df5806924c963f7bfaa4c83f2126efa7e7d8d4748e344f8b1024575c"
+    }
+  }
+}

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 set -euo pipefail
 
 # Example 
@@ -24,8 +27,9 @@ fetch() {
 fetch "setup-repo.sh"
 fetch "build-and-push.sh"
 fetch "build-master-doc.mjs"
+fetch "sync-main-to-dev.sh"
 
-chmod +x scripts/setup-repo.sh scripts/build-and-push.sh
+chmod +x scripts/setup-repo.sh scripts/build-and-push.sh scripts/sync-main-to-dev.sh
 
 echo "✅ Installed scripts. Running setup..."
 bash scripts/setup-repo.sh

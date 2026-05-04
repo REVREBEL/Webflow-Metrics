@@ -433,13 +433,15 @@ export function TableRegistry() {
                         <p className="text-sm text-muted-foreground mt-1">{table.description}</p>
                       )}
                     </div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteTable(table.id!)}
-                    >
-                      Delete
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => deleteTable(table.id!)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                   
                   {table.full_table_path && (
@@ -474,6 +476,7 @@ export function TableRegistry() {
     </div>
   );
 }
+
 
 
 

@@ -21,6 +21,11 @@ export const POST: APIRoute = async ({ locals }) => {
     '0002_complete_schema.sql',
     '0003_global_templates.sql',
     '0004_table_registry.sql',
+    '0005_add_group_by_function.sql',
+    '0006_cache_and_calculations.sql',
+    '0007_metric_definitions.sql',
+    '0008_default_metrics.sql',
+    '0009_add_total_rooms.sql',
   ];
 
   try {
@@ -126,6 +131,62 @@ export const POST: APIRoute = async ({ locals }) => {
     `).run();
 
     console.log('Global query templates table created successfully');
+    console.log('Creating data templates and metric definitions tables...');
+
+    // Data templates define what raw data to fetch from BigQuery
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS data_templates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        template_name TEXT NOT NULL UNIQUE,
+        description TEXT,
+        query_template TEXT NOT NULL,
+        output_columns TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `).run();
+
+    console.log('Data templates table created successfully');
+
+    // Metric definitions define how to calculate metrics from cached data
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS metric_definitions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        metric_name TEXT NOT NULL,
+        data_template_id INTEGER NOT NULL,
+        formula TEXT NOT NULL,
+        format_type TEXT NOT NULL DEFAULT 'number',
+        decimal_places INTEGER DEFAULT 2,
+        prefix TEXT,
+        suffix TEXT,
+        display_order INTEGER DEFAULT 0,
+        category TEXT,
+        description TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (data_template_id) REFERENCES data_templates(id) ON DELETE CASCADE
+      )
+    `).run();
+
+    console.log('Metric definitions table created successfully');
+
+    // Card configurations for dashboard
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS card_configs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        card_name TEXT NOT NULL,
+        metric_id INTEGER NOT NULL,
+        position INTEGER DEFAULT 0,
+        size TEXT DEFAULT 'medium',
+        color_scheme TEXT DEFAULT 'default',
+        show_trend INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (metric_id) REFERENCES metric_definitions(id) ON DELETE CASCADE
+      )
+    `).run();
+
+    console.log('Card configs table created successfully');
     console.log('Creating table registry tables...');
 
     // BigQuery Tables Registry
@@ -242,6 +303,8 @@ export const POST: APIRoute = async ({ locals }) => {
     await db.prepare('CREATE INDEX IF NOT EXISTS idx_table_columns_table ON bigquery_table_columns(table_id)').run();
     await db.prepare('CREATE INDEX IF NOT EXISTS idx_templates_v2_table ON query_templates_v2(table_id)').run();
     await db.prepare('CREATE INDEX IF NOT EXISTS idx_template_suggestions_table ON template_suggestions(table_key)').run();
+    await db.prepare('CREATE INDEX IF NOT EXISTS idx_metric_definitions_template ON metric_definitions(data_template_id)').run();
+    await db.prepare('CREATE INDEX IF NOT EXISTS idx_card_configs_metric ON card_configs(metric_id)').run();
 
     console.log('Indexes created successfully');
     console.log('Inserting template suggestions...');
@@ -326,6 +389,10 @@ export const OPTIONS: APIRoute = async () => {
     },
   });
 };
+
+
+
+
 
 
 

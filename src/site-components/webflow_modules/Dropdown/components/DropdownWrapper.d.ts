@@ -1,22 +1,24 @@
 import * as React from "react";
-type DropdownProps = React.PropsWithChildren<{
-  tag?: keyof HTMLElementTagNameMap;
-  className?: string;
-}>;
+import { Props } from "../../types";
+type DropdownProps = Props<
+  "div",
+  {
+    tag?: keyof HTMLElementTagNameMap;
+  }
+>;
 type DropdownWrapperProps = DropdownProps & {
   delay: number;
   hover: boolean;
 };
 export type { DropdownWrapperProps };
 declare const DropdownWrapper: React.ForwardRefExoticComponent<
-  {
+  import("../../types").ElementProps<"div"> & {
     tag?: keyof HTMLElementTagNameMap;
-    className?: string;
   } & {
     children?: React.ReactNode | undefined;
   } & {
     delay: number;
     hover: boolean;
-  } & React.RefAttributes<unknown>
+  } & React.RefAttributes<HTMLElement>
 >;
 export default DropdownWrapper;

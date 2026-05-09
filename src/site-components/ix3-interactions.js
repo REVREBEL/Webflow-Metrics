@@ -3,8 +3,10 @@ export const IX3Context = React.createContext({
   registerIX3: null,
 });
 async function loadAndCreateIX3Engine() {
-  await import("./devlink-gsap");
-  const { createIX3Engine } = await import("./devlink-ix3");
+  const gsapPath = "./webflow_modules/" + "devlink-gsap";
+  const ix3Path = "./webflow_modules/" + "devlink-ix3";
+  await import(gsapPath);
+  const { createIX3Engine } = await import(ix3Path);
   return createIX3Engine();
 }
 export const IX3Provider = ({ children }) => {

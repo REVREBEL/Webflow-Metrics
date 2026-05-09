@@ -1,13 +1,16 @@
 import * as React from "react";
+import { Props } from "../../types";
 type TwitterSize = "m" | "l";
 type TwitterMode = "follow" | "tweet";
-type TwitterProps = React.PropsWithChildren<{
-  className?: string;
-  mode?: TwitterMode;
-  url?: string;
-  text?: string;
-  size?: TwitterSize;
-}>;
+type TwitterProps = Props<
+  "div",
+  {
+    mode?: TwitterMode;
+    url?: string;
+    text?: string;
+    size?: TwitterSize;
+  }
+>;
 declare global {
   interface Window {
     twttr: any;
@@ -15,8 +18,7 @@ declare global {
 }
 export type { TwitterProps, TwitterSize, TwitterMode };
 declare const Twitter: React.ForwardRefExoticComponent<
-  {
-    className?: string;
+  import("../../types").ElementProps<"div"> & {
     mode?: TwitterMode;
     url?: string;
     text?: string;

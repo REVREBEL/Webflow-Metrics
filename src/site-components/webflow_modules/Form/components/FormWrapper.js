@@ -14,8 +14,11 @@ const FormWrapper = React.forwardRef(function FormWrapper(
   ref
 ) {
   const [state, setState] = React.useState(initialState);
-  const formName =
-    (children.find((c) => c.type === FormForm)?.props)["data-name"] ?? "Form";
+  const childrenArray = React.Children.toArray(children);
+  const formFormChild = childrenArray.find(
+    (c) => React.isValidElement(c) && c.type === FormForm
+  );
+  const formName = formFormChild?.props?.["data-name"] ?? "Form";
   return React.createElement(
     "div",
     {
@@ -24,13 +27,17 @@ const FormWrapper = React.forwardRef(function FormWrapper(
       ref,
     },
     React.Children.map(children, (child) => {
+      if (!React.isValidElement(child)) {
+        return child;
+      }
       if (child.type === FormForm) {
         const style = {};
         if (state === "success") {
           style.display = "none";
         }
-        return React.cloneElement(child, {
-          ...child.props,
+        const formChild = child;
+        return React.cloneElement(formChild, {
+          ...formChild.props,
           style,
           onSubmit: async (e) => {
             try {
@@ -59,8 +66,9 @@ const FormWrapper = React.forwardRef(function FormWrapper(
         if (state === "error") {
           style.display = "none";
         }
-        return React.cloneElement(child, {
-          ...child.props,
+        const successChild = child;
+        return React.cloneElement(successChild, {
+          ...successChild.props,
           style,
           tabIndex: -1,
           role: "region",
@@ -75,8 +83,9 @@ const FormWrapper = React.forwardRef(function FormWrapper(
         if (state === "error") {
           style.display = "block";
         }
-        return React.cloneElement(child, {
-          ...child.props,
+        const errorChild = child;
+        return React.cloneElement(errorChild, {
+          ...errorChild.props,
           tabIndex: -1,
           role: "region",
           "aria-label": `${formName} failure`,

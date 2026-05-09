@@ -1,11 +1,17 @@
 import * as React from "react";
-type TabsContentProps = {
-  tag?: React.ElementType;
-  className?: string;
-  children?: React.ReactNode;
-};
+import { Props } from "../../types";
+type TabsContentProps = Props<
+  "div",
+  {
+    tag?: React.ElementType;
+  }
+>;
 export type { TabsContentProps };
 declare const TabsContent: React.ForwardRefExoticComponent<
-  TabsContentProps & React.RefAttributes<HTMLElement>
+  import("../../types").ElementProps<"div"> & {
+    tag?: React.ElementType;
+  } & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLElement>
 >;
 export default TabsContent;

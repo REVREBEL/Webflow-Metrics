@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -11,6 +10,8 @@ import { baseUrl } from '../lib/base-url';
 import { QueryBuilder } from './QueryBuilder';
 import { TableRegistry } from './TableRegistry';
 import { MigrationManager } from './MigrationManager';
+import MetricsManager from './MetricsManager';
+import CardManager from './CardManager';
 
 interface Hotel {
   id?: number;
@@ -22,6 +23,7 @@ interface Hotel {
   data_location: string;
   created_at?: string;
   updated_at?: string;
+  total_rooms?: number;
 }
 
 interface GlobalQueryTemplate {
@@ -53,7 +55,8 @@ export function AdminPanel() {
     data_location: 'US',
     project_id: '',
     dataset_id: '',
-    table_id: ''
+    table_id: '',
+    total_rooms: undefined
   });
 
   const [templateFormData, setTemplateFormData] = useState({
@@ -170,7 +173,8 @@ export function AdminPanel() {
           data_location: 'US',
           project_id: '',
           dataset_id: '',
-          table_id: ''
+          table_id: '',
+          total_rooms: undefined
         });
         fetchHotels();
       } else {
@@ -266,6 +270,7 @@ export function AdminPanel() {
       table_id: hotel.table_id || '',
       data_location: hotel.data_location,
       service_account_json: '', // Leave empty for security - user must re-enter
+      total_rooms: hotel.total_rooms
     });
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -339,21 +344,246 @@ export function AdminPanel() {
         </Alert>
       )}
 
-      <Tabs defaultValue="hotels" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="query-builder">Query Builder</TabsTrigger>
-          <TabsTrigger value="table-registry">Table Registry</TabsTrigger>
-          <TabsTrigger value="migrations">Migrations</TabsTrigger>
-          <TabsTrigger value="cache">Cache</TabsTrigger>
           <TabsTrigger value="hotels">Hotels</TabsTrigger>
+          <TabsTrigger value="templates">Data Templates</TabsTrigger>
+          <TabsTrigger value="metrics">Metrics</TabsTrigger>
+          <TabsTrigger value="cards">Dashboard Cards</TabsTrigger>
+          <TabsTrigger value="migrations">Database</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="query-builder" className="space-y-6">
-          <QueryBuilder />
+        <TabsContent value="hotels" className="space-y-6">
+          {/* Database Tools */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Database Tools</CardTitle>
+              <CardDescription>
+                Initialize the database schema (creates tables if they don't exist)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-4 items-center">
+              <Button
+                onClick={initializeDatabase}
+                disabled={initializingDb}
+                variant="outline"
+              >
+                {initializingDb ? 'Initializing...' : 'Initialize Database'}
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                <p>Run this once to create the database tables. Safe to run multiple times.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Add Hotel Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Add/Update Hotel Configuration</CardTitle>
+              <CardDescription>
+                {formData.hotel_code 
+                  ? `Editing: ${formData.hotel_name} (${formData.hotel_code}) - Re-enter Service Account JSON to update credentials`
+                  : 'Configure BigQuery credentials and settings for each hotel property'
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hotel_name">Hotel Name *</Label>
+                    <Input
+                      id="hotel_name"
+                      placeholder="Detroit Doubletree"
+                      value={formData.hotel_name}
+                      onChange={(e) => setFormData({ ...formData, hotel_name: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="hotel_code">Hotel Code *</Label>
+                    <Input
+                      id="hotel_code"
+                      placeholder="DTW01"
+                      value={formData.hotel_code}
+                      onChange={(e) => setFormData({ ...formData, hotel_code: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="total_rooms">Total Rooms</Label>
+                  <Input
+                    id="total_rooms"
+                    type="number"
+                    placeholder="250"
+                    value={formData.total_rooms || ''}
+                    onChange={(e) => setFormData({ ...formData, total_rooms: e.target.value ? parseInt(e.target.value) : undefined })}
+                    min="1"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Total number of rooms in the hotel (used for occupancy calculations)
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="project_id">BigQuery Project ID *</Label>
+                    <Input
+                      id="project_id"
+                      placeholder="my-project-123456"
+                      value={formData.project_id}
+                      onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="data_location">Data Location</Label>
+                    <Input
+                      id="data_location"
+                      placeholder="US"
+                      value={formData.data_location}
+                      onChange={(e) => setFormData({ ...formData, data_location: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dataset_id">Dataset ID (optional)</Label>
+                    <Input
+                      id="dataset_id"
+                      placeholder="analytics_dataset"
+                      value={formData.dataset_id}
+                      onChange={(e) => setFormData({ ...formData, dataset_id: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="table_id">Table ID (optional)</Label>
+                    <Input
+                      id="table_id"
+                      placeholder="bookings_table"
+                      value={formData.table_id}
+                      onChange={(e) => setFormData({ ...formData, table_id: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="service_account_json">Service Account JSON *</Label>
+                  <Textarea
+                    id="service_account_json"
+                    placeholder='{"type": "service_account", ...}'
+                    value={formData.service_account_json}
+                    onChange={(e) => setFormData({ ...formData, service_account_json: e.target.value })}
+                    rows={8}
+                    className="font-mono text-sm"
+                    required
+                  />
+                </div>
+
+                <Button type="submit" className="w-full" disabled={dbInitialized === false}>
+                  {formData.hotel_code ? 'Update Hotel Configuration' : 'Save Hotel Configuration'}
+                </Button>
+                
+                {formData.hotel_code && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setFormData({
+                      hotel_code: '',
+                      hotel_name: '',
+                      service_account_json: '',
+                      data_location: 'US',
+                      project_id: '',
+                      dataset_id: '',
+                      table_id: '',
+                      total_rooms: undefined
+                    })}
+                  >
+                    Cancel Edit
+                  </Button>
+                )}
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Hotels List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Configured Hotels</CardTitle>
+              <CardDescription>
+                {hotels.length} hotel(s) configured
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <p className="text-center py-8 text-muted-foreground">Loading hotels...</p>
+              ) : hotels.length === 0 ? (
+                <p className="text-center py-8 text-muted-foreground">No hotels configured yet</p>
+              ) : (
+                <div className="space-y-3">
+                  {hotels.map((hotel) => (
+                    <div 
+                      key={hotel.hotel_code}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                    >
+                      <div>
+                        <h3 className="font-semibold">{hotel.hotel_name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Code: {hotel.hotel_code} • Project: {hotel.project_id} • Location: {hotel.data_location}
+                          {hotel.total_rooms && ` • Rooms: ${hotel.total_rooms}`}
+                        </p>
+                        {(hotel.dataset_id || hotel.table_id) && (
+                          <p className="text-sm text-muted-foreground">
+                            {hotel.dataset_id && `Dataset: ${hotel.dataset_id}`}
+                            {hotel.dataset_id && hotel.table_id && ' • '}
+                            {hotel.table_id && `Table: ${hotel.table_id}`}
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Updated: {new Date(hotel.updated_at || hotel.created_at || Date.now()).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditHotel(hotel)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteHotel(hotel.hotel_code)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="table-registry" className="space-y-6">
+        <TabsContent value="templates" className="space-y-6">
           <TableRegistry />
+        </TabsContent>
+
+        <TabsContent value="metrics" className="space-y-6">
+          <MetricsManager />
+        </TabsContent>
+
+        <TabsContent value="cards" className="space-y-6">
+          <CardManager />
         </TabsContent>
 
         <TabsContent value="migrations" className="space-y-6">
@@ -501,214 +731,18 @@ export function AdminPanel() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="hotels" className="space-y-6">
-          {/* Database Tools */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Database Tools</CardTitle>
-              <CardDescription>
-                Initialize the database schema (creates tables if they don't exist)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex gap-4 items-center">
-              <Button
-                onClick={initializeDatabase}
-                disabled={initializingDb}
-                variant="outline"
-              >
-                {initializingDb ? 'Initializing...' : 'Initialize Database'}
-              </Button>
-              <div className="text-sm text-muted-foreground">
-                <p>Run this once to create the database tables. Safe to run multiple times.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Add Hotel Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Add/Update Hotel Configuration</CardTitle>
-              <CardDescription>
-                {formData.hotel_code 
-                  ? `Editing: ${formData.hotel_name} (${formData.hotel_code}) - Re-enter Service Account JSON to update credentials`
-                  : 'Configure BigQuery credentials and settings for each hotel property'
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="hotel_code">Hotel Code *</Label>
-                    <Input
-                      id="hotel_code"
-                      placeholder="DTWDFH"
-                      value={formData.hotel_code}
-                      onChange={(e) => setFormData({ ...formData, hotel_code: e.target.value.toUpperCase() })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="hotel_name">Hotel Name *</Label>
-                    <Input
-                      id="hotel_name"
-                      placeholder="Detroit Doubletree"
-                      value={formData.hotel_name}
-                      onChange={(e) => setFormData({ ...formData, hotel_name: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="project_id">BigQuery Project ID *</Label>
-                    <Input
-                      id="project_id"
-                      placeholder="my-project-123456"
-                      value={formData.project_id}
-                      onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="data_location">Data Location</Label>
-                    <Input
-                      id="data_location"
-                      placeholder="US"
-                      value={formData.data_location}
-                      onChange={(e) => setFormData({ ...formData, data_location: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="dataset_id">Dataset ID (optional)</Label>
-                    <Input
-                      id="dataset_id"
-                      placeholder="analytics_dataset"
-                      value={formData.dataset_id}
-                      onChange={(e) => setFormData({ ...formData, dataset_id: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="table_id">Table ID (optional)</Label>
-                    <Input
-                      id="table_id"
-                      placeholder="bookings_table"
-                      value={formData.table_id}
-                      onChange={(e) => setFormData({ ...formData, table_id: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="service_account_json">Service Account JSON *</Label>
-                  <Textarea
-                    id="service_account_json"
-                    placeholder='{"type": "service_account", ...}'
-                    value={formData.service_account_json}
-                    onChange={(e) => setFormData({ ...formData, service_account_json: e.target.value })}
-                    rows={8}
-                    className="font-mono text-sm"
-                    required
-                  />
-                </div>
-
-                <Button type="submit" className="w-full" disabled={dbInitialized === false}>
-                  {formData.hotel_code ? 'Update Hotel Configuration' : 'Save Hotel Configuration'}
-                </Button>
-                
-                {formData.hotel_code && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => setFormData({
-                      hotel_code: '',
-                      hotel_name: '',
-                      service_account_json: '',
-                      data_location: 'US',
-                      project_id: '',
-                      dataset_id: '',
-                      table_id: ''
-                    })}
-                  >
-                    Cancel Edit
-                  </Button>
-                )}
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Hotels List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Configured Hotels</CardTitle>
-              <CardDescription>
-                {hotels.length} hotel(s) configured
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <p className="text-center py-8 text-muted-foreground">Loading hotels...</p>
-              ) : hotels.length === 0 ? (
-                <p className="text-center py-8 text-muted-foreground">No hotels configured yet</p>
-              ) : (
-                <div className="space-y-3">
-                  {hotels.map((hotel) => (
-                    <div 
-                      key={hotel.hotel_code}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
-                    >
-                      <div>
-                        <h3 className="font-semibold">{hotel.hotel_name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Code: {hotel.hotel_code} • Project: {hotel.project_id} • Location: {hotel.data_location}
-                        </p>
-                        {(hotel.dataset_id || hotel.table_id) && (
-                          <p className="text-sm text-muted-foreground">
-                            {hotel.dataset_id && `Dataset: ${hotel.dataset_id}`}
-                            {hotel.dataset_id && hotel.table_id && ' • '}
-                            {hotel.table_id && `Table: ${hotel.table_id}`}
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Updated: {new Date(hotel.updated_at || hotel.created_at || Date.now()).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditHotel(hotel)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteHotel(hotel.hotel_code)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+
+
+
+
+
+
+
 
 
 

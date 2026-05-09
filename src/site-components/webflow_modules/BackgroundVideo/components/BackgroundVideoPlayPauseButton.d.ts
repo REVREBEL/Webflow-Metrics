@@ -1,10 +1,10 @@
 import React from "react";
-type BackgroundVideoPlayPauseButtonProps = {
-  className?: string;
-  children: React.ReactNode;
-};
+import { Props } from "../../types";
+type BackgroundVideoPlayPauseButtonProps = Props<"button">;
 export type { BackgroundVideoPlayPauseButtonProps };
 declare const BackgroundVideoPlayPauseButton: React.ForwardRefExoticComponent<
-  BackgroundVideoPlayPauseButtonProps & React.RefAttributes<HTMLButtonElement>
+  import("../../types").ElementProps<"button"> & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLButtonElement>
 >;
 export default BackgroundVideoPlayPauseButton;

@@ -1,12 +1,9 @@
 import * as React from "react";
-type SliderMaskProps = React.PropsWithChildren<{
-  className?: string;
-}>;
+import { Props } from "../../types";
+type SliderMaskProps = Props<"div">;
 export type { SliderMaskProps };
 declare const SliderMask: React.ForwardRefExoticComponent<
-  {
-    className?: string;
-  } & {
+  import("../../types").ElementProps<"div"> & {
     children?: React.ReactNode | undefined;
   } & React.RefAttributes<HTMLDivElement>
 >;

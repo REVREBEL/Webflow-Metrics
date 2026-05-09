@@ -82,6 +82,7 @@ const SliderWrapper = React.forwardRef(function SlideWrapper(
       "div",
       {
         ...swipeHandlers,
+        ...props,
         className: cj(className, "w-slider"),
         role: "region",
         "aria-label": "carousel",

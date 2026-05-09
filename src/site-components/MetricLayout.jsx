@@ -56,7 +56,6 @@ export function MetricLayout({
       >
         <Block
           className={`variant_metric-label ${_activeStyleVariant}`}
-          id={"w-node-_1279c10b-9a4b-6a8e-816a-24990d295739-0d295738"}
           metric-type={
             applyPredicate(metricType)(
               textEquals({
@@ -118,12 +117,10 @@ export function MetricLayout({
         </Block>
         <Block
           className={`variant_metric-wrapper is-gap-col_1-2rem ${_activeStyleVariant}`}
-          id={"w-node-_1279c10b-9a4b-6a8e-816a-24990d29573b-0d295738"}
           tag={"div"}
         >
           <Block
             className={`metric-value add-front-padding ${_activeStyleVariant}`}
-            id={"w-node-_1279c10b-9a4b-6a8e-816a-24990d29573c-0d295738"}
             metric-format={metricFormat}
             tag={"div"}
             {...metricRuntimeProps}

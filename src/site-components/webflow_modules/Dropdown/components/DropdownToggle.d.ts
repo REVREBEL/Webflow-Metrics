@@ -1,15 +1,17 @@
 import * as React from "react";
-type DropdownToggleProps = React.PropsWithChildren<{
-  tag?: keyof HTMLElementTagNameMap;
-  className?: string;
-}>;
-export type { DropdownToggleProps };
-declare const DropdownToggle: React.ForwardRefExoticComponent<
+import { Props } from "../../types";
+type DropdownToggleProps = Props<
+  "div",
   {
     tag?: keyof HTMLElementTagNameMap;
-    className?: string;
+  }
+>;
+export type { DropdownToggleProps };
+declare const DropdownToggle: React.ForwardRefExoticComponent<
+  import("../../types").ElementProps<"div"> & {
+    tag?: keyof HTMLElementTagNameMap;
   } & {
     children?: React.ReactNode | undefined;
-  } & React.RefAttributes<unknown>
+  } & React.RefAttributes<HTMLElement>
 >;
 export default DropdownToggle;

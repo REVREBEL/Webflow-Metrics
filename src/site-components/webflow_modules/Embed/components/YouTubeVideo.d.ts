@@ -1,18 +1,33 @@
 import * as React from "react";
-type YouTubeVideoProps = {
-  className?: string;
-  title: string;
-  videoId: string;
-  aspectRatio?: number;
-  startAt?: number;
-  showAllRelatedVideos?: boolean;
-  controls?: boolean;
-  autoplay?: boolean;
-  muted?: boolean;
-  privacyMode?: boolean;
-};
+import { Props } from "../../types";
+type YouTubeVideoProps = Props<
+  "div",
+  {
+    title: string;
+    videoId: string;
+    aspectRatio?: number;
+    startAt?: number;
+    showAllRelatedVideos?: boolean;
+    controls?: boolean;
+    autoplay?: boolean;
+    muted?: boolean;
+    privacyMode?: boolean;
+  }
+>;
 export type { YouTubeVideoProps };
 declare const YouTubeVideo: React.ForwardRefExoticComponent<
-  YouTubeVideoProps & React.RefAttributes<HTMLDivElement>
+  import("../../types").ElementProps<"div"> & {
+    title: string;
+    videoId: string;
+    aspectRatio?: number;
+    startAt?: number;
+    showAllRelatedVideos?: boolean;
+    controls?: boolean;
+    autoplay?: boolean;
+    muted?: boolean;
+    privacyMode?: boolean;
+  } & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLDivElement>
 >;
 export default YouTubeVideo;

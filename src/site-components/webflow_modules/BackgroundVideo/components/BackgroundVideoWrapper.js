@@ -11,6 +11,7 @@ const BackgroundVideoWrapper = React.forwardRef(function BackgroundVideoWrapper(
     sources = [],
     posterImage = "",
     children,
+    ...props
   },
   ref
 ) {
@@ -32,6 +33,7 @@ const BackgroundVideoWrapper = React.forwardRef(function BackgroundVideoWrapper(
     React.createElement(
       tag,
       {
+        ...props,
         className: cj(
           className,
           "w-background-video",

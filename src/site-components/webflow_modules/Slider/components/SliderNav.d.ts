@@ -1,9 +1,10 @@
 import * as React from "react";
-type SliderNavProps = {
-  className?: string;
-};
+import { Props } from "../../types";
+type SliderNavProps = Props<"div">;
 export type { SliderNavProps };
 declare const SliderNav: React.ForwardRefExoticComponent<
-  SliderNavProps & React.RefAttributes<HTMLDivElement>
+  import("../../types").ElementProps<"div"> & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLDivElement>
 >;
 export default SliderNav;

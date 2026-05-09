@@ -1,10 +1,11 @@
 import React from "react";
-type FormReCaptchaProps = {
-  siteKey?: string;
-  theme?: "light" | "dark";
-  size?: "compact" | "normal" | "invisible";
-};
 declare const FormReCaptcha: React.ForwardRefExoticComponent<
-  FormReCaptchaProps & React.RefAttributes<HTMLDivElement>
+  import("../../types").ElementProps<"div"> & {
+    siteKey?: string;
+    theme?: "light" | "dark";
+    size?: "compact" | "normal" | "invisible";
+  } & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLDivElement>
 >;
 export default FormReCaptcha;

@@ -132,9 +132,11 @@ function Navbar({ tag = "div", className = "", children, config, ...props }) {
     )
   );
 }
-const NavbarWrapper = React.forwardRef(function NavbarWrapper(props, ref) {
-  const { animation, docHeight, easing, easing2, duration, noScroll } =
-    props.config;
+const NavbarWrapper = React.forwardRef(function NavbarWrapper(
+  { config, tag, ...props },
+  ref
+) {
+  const { animation, docHeight, easing, easing2, duration, noScroll } = config;
   const root = React.useRef(null);
   const menu = React.useRef(null);
   const animOver = /^over/.test(animation);
@@ -199,7 +201,15 @@ const NavbarWrapper = React.forwardRef(function NavbarWrapper(props, ref) {
         fill: "forwards",
       });
     }
-  }, [animDirect, animOver, duration, easing, getBodyHeight, getOffsetHeight, isOpen]);
+  }, [
+    animDirect,
+    animOver,
+    duration,
+    easing,
+    getBodyHeight,
+    getOffsetHeight,
+    isOpen,
+  ]);
   useLayoutEffect(() => {
     if (isOpen && noScroll) {
       document.body.style.overflowY = "hidden";
@@ -222,7 +232,7 @@ const NavbarWrapper = React.forwardRef(function NavbarWrapper(props, ref) {
     NavbarContext.Provider,
     {
       value: {
-        ...props.config,
+        ...config,
         root,
         menu,
         animOver,
@@ -235,7 +245,7 @@ const NavbarWrapper = React.forwardRef(function NavbarWrapper(props, ref) {
         setFocusedLink,
       },
     },
-    React.createElement(Navbar, { ...props })
+    React.createElement(Navbar, { config: config, tag: tag, ...props })
   );
 });
 export default NavbarWrapper;

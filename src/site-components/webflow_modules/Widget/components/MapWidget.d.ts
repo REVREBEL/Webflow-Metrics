@@ -1,4 +1,5 @@
 import React from "react";
+import { Props } from "../../types";
 declare global {
   interface Window {
     google: {
@@ -6,19 +7,32 @@ declare global {
     };
   }
 }
-type MapWidgetProps = {
-  className?: string;
-  apiKey?: string;
-  zoom?: number;
-  latlng?: string;
-  mapStyle?: "roadmap" | "satellite" | "hybrid" | "terrain";
-  tooltip?: string;
-  title?: string;
-  enableScroll?: boolean;
-  enableTouch?: boolean;
-};
+type MapWidgetProps = Props<
+  "div",
+  {
+    apiKey?: string;
+    zoom?: number;
+    latlng?: string;
+    mapStyle?: "roadmap" | "satellite" | "hybrid" | "terrain";
+    tooltip?: string;
+    title?: string;
+    enableScroll?: boolean;
+    enableTouch?: boolean;
+  }
+>;
 export type { MapWidgetProps };
 declare const MapWidget: React.ForwardRefExoticComponent<
-  MapWidgetProps & React.RefAttributes<HTMLDivElement>
+  import("../../types").ElementProps<"div"> & {
+    apiKey?: string;
+    zoom?: number;
+    latlng?: string;
+    mapStyle?: "roadmap" | "satellite" | "hybrid" | "terrain";
+    tooltip?: string;
+    title?: string;
+    enableScroll?: boolean;
+    enableTouch?: boolean;
+  } & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLDivElement>
 >;
 export default MapWidget;

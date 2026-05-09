@@ -1,13 +1,20 @@
 import * as React from "react";
 import { NavbarConfig } from "../helpers/navbarContext";
-type NavbarProps = {
-  tag: React.ElementType;
-  config: NavbarConfig;
-  className?: string;
-  children?: React.ReactNode;
-};
+import { Props } from "../../types";
+type NavbarProps = Props<
+  "div",
+  {
+    tag: React.ElementType;
+    config: NavbarConfig;
+  }
+>;
 export type { NavbarProps };
 declare const NavbarWrapper: React.ForwardRefExoticComponent<
-  NavbarProps & React.RefAttributes<HTMLElement>
+  import("../../types").ElementProps<"div"> & {
+    tag: React.ElementType;
+    config: NavbarConfig;
+  } & {
+    children?: React.ReactNode | undefined;
+  } & React.RefAttributes<HTMLElement>
 >;
 export default NavbarWrapper;

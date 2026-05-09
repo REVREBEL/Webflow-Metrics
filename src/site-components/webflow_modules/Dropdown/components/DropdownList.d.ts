@@ -1,15 +1,17 @@
 import * as React from "react";
-type DropdownListProps = React.PropsWithChildren<{
-  tag?: keyof HTMLElementTagNameMap;
-  className?: string;
-}>;
-export type { DropdownListProps };
-declare const DropdownList: React.ForwardRefExoticComponent<
+import { Props } from "../../types";
+type DropdownListProps = Props<
+  "nav",
   {
     tag?: keyof HTMLElementTagNameMap;
-    className?: string;
+  }
+>;
+export type { DropdownListProps };
+declare const DropdownList: React.ForwardRefExoticComponent<
+  import("../../types").ElementProps<"nav"> & {
+    tag?: keyof HTMLElementTagNameMap;
   } & {
     children?: React.ReactNode | undefined;
-  } & React.RefAttributes<unknown>
+  } & React.RefAttributes<HTMLElement>
 >;
 export default DropdownList;

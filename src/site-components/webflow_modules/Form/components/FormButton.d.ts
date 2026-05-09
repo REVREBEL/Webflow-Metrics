@@ -9,6 +9,6 @@ declare const FormButton: React.ForwardRefExoticComponent<
           type?: string;
           name?: string;
         };
-  } & React.RefAttributes<unknown>
+  } & React.RefAttributes<HTMLInputElement>
 >;
 export default FormButton;

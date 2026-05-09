@@ -11,7 +11,7 @@ const INITIAL_DROPDOWN_STATE = {
   isOpen: false,
   openingCount: 0,
 };
-function Dropdown({ tag = "div", className = "", ...props }) {
+function Dropdown({ tag = "div", className = "", children, ...props }) {
   const { root, setFocusedLink, hover, toggleOpen } =
     React.useContext(DropdownContext);
   const { isOpen: isNavbarOpen } = React.useContext(NavbarContext);
@@ -58,26 +58,30 @@ function Dropdown({ tag = "div", className = "", ...props }) {
       }
     }
   };
-  return React.createElement(tag, {
-    ...props,
-    ref: root,
-    onKeyDown: handleFocus,
-    onMouseEnter: () => {
-      if (hover) {
-        toggleOpen();
-      }
+  return React.createElement(
+    tag,
+    {
+      ...props,
+      ref: root,
+      onKeyDown: handleFocus,
+      onMouseEnter: () => {
+        if (hover) {
+          toggleOpen();
+        }
+      },
+      onMouseLeave: () => {
+        if (hover) {
+          toggleOpen();
+        }
+      },
+      className: cj(
+        className,
+        "w-dropdown",
+        isNavbarOpen && "w--nav-dropdown-open"
+      ),
     },
-    onMouseLeave: () => {
-      if (hover) {
-        toggleOpen();
-      }
-    },
-    className: cj(
-      className,
-      "w-dropdown",
-      isNavbarOpen && "w--nav-dropdown-open"
-    ),
-  });
+    children
+  );
 }
 const DropdownWrapper = React.forwardRef(function DropdownWrapper(
   { delay, hover, ...props },

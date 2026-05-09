@@ -19,30 +19,14 @@ export function RevenueMetric({
         className={"metric-wrapper is-horizontal is-gap-col_1rem"}
         tag={"div"}
       >
-        <Block
-          className={"metric-label is-align-top"}
-          id={"w-node-_0fe37f4e-7fd7-7fc6-89c9-4040519d9e4d-519d9e4c"}
-          tag={"div"}
-        >
+        <Block className={"metric-label is-align-top"} tag={"div"}>
           {text1}
         </Block>
-        <Block
-          className={"metric-wrapper"}
-          id={"w-node-_0fe37f4e-7fd7-7fc6-89c9-4040519d9e4f-519d9e4c"}
-          tag={"div"}
-        >
-          <Block
-            className={"metric-value is-current-0dp"}
-            id={"w-node-_0fe37f4e-7fd7-7fc6-89c9-4040519d9e50-519d9e4c"}
-            tag={"div"}
-          >
+        <Block className={"metric-wrapper"} tag={"div"}>
+          <Block className={"metric-value is-current-0dp"} tag={"div"}>
             {text2}
           </Block>
-          <Block
-            className={"metric-value is-current-0dp is-var"}
-            id={"w-node-_0fe37f4e-7fd7-7fc6-89c9-4040519d9e52-519d9e4c"}
-            tag={"div"}
-          >
+          <Block className={"metric-value is-current-0dp is-var"} tag={"div"}>
             {text3}
           </Block>
         </Block>

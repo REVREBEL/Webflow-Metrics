@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
     // Fetch all hotels (only basic info, no sensitive data)
     const { results } = await db
-      .prepare('SELECT hotel_code, hotel_name FROM hotels ORDER BY hotel_name')
+      .prepare('SELECT hotel_code, hotel_name, total_rooms FROM hotels ORDER BY hotel_name')
       .all();
 
     return new Response(JSON.stringify({ hotels: results || [] }), {
@@ -46,3 +46,4 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+

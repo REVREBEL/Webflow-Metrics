@@ -1,16 +1,18 @@
 import * as React from "react";
-type FacebookProps = React.PropsWithChildren<{
-  className?: string;
-  layout?: string;
-  width?: number;
-  height?: number;
-  url?: string;
-  locale?: string;
-}>;
+import { Props } from "../../types";
+type FacebookProps = Props<
+  "div",
+  {
+    layout?: string;
+    width?: number;
+    height?: number;
+    url?: string;
+    locale?: string;
+  }
+>;
 export type { FacebookProps };
 declare const Facebook: React.ForwardRefExoticComponent<
-  {
-    className?: string;
+  import("../../types").ElementProps<"div"> & {
     layout?: string;
     width?: number;
     height?: number;

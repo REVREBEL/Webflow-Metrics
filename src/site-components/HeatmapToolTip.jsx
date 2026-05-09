@@ -53,14 +53,12 @@ export function HeatmapToolTip({
               <HtmlEmbed
                 className={"arrowcircleup"}
                 content={""}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb0610f-fdb06106"}
                 value={
                   "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20id%3D%22ArrowCircleUp%22%20data-name%3D%22ArrowCircleUp%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22currentColor%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%3Cpath%20d%3D%22M12%2C3C7%2C3%2C3%2C7%2C3%2C12s4%2C9%2C9%2C9%2C9-4%2C9-9S17%2C3%2C12%2C3ZM15.326%2C10.589c-.051.099-.153.161-.264.161h-1.437v3.856c0%2C.164-.133.297-.297.297h-2.658c-.164%2C0-.297-.133-.297-.296v-3.856s-1.436%2C0-1.436%2C0c-.111%2C0-.213-.062-.264-.161-.051-.099-.043-.218.022-.308l3.052-4.294c.056-.078.145-.125.241-.125h0c.096%2C0%2C.185.046.241.124l3.072%2C4.294c.065.091.074.21.023.308Z%22%2F%3E%0A%3C%2Fsvg%3E"
                 }
               />
               <Block
                 className={"tool-tip_metric is-numeric"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06110-fdb06106"}
                 tag={"div"}
                 {...roomsMetricRuntimeProps}
               >
@@ -68,7 +66,6 @@ export function HeatmapToolTip({
               </Block>
               <Block
                 className={"tool-tip_label is-center"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06112-fdb06106"}
                 tag={"div"}
                 {...roomsLabelRuntimeProps}
               >
@@ -79,14 +76,12 @@ export function HeatmapToolTip({
               <HtmlEmbed
                 className={"arrowcircleup"}
                 content={""}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb0611d-fdb06106"}
                 value={
                   "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20id%3D%22ArrowCircleUp%22%20data-name%3D%22ArrowCircleUp%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22currentColor%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%3Cpath%20d%3D%22M12%2C3C7%2C3%2C3%2C7%2C3%2C12s4%2C9%2C9%2C9%2C9-4%2C9-9S17%2C3%2C12%2C3ZM15.326%2C10.589c-.051.099-.153.161-.264.161h-1.437v3.856c0%2C.164-.133.297-.297.297h-2.658c-.164%2C0-.297-.133-.297-.296v-3.856s-1.436%2C0-1.436%2C0c-.111%2C0-.213-.062-.264-.161-.051-.099-.043-.218.022-.308l3.052-4.294c.056-.078.145-.125.241-.125h0c.096%2C0%2C.185.046.241.124l3.072%2C4.294c.065.091.074.21.023.308Z%22%2F%3E%0A%3C%2Fsvg%3E"
                 }
               />
               <Block
                 className={"tool-tip_metric is-currency"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb0611e-fdb06106"}
                 tag={"div"}
                 {...adrMetricRuntimeProps}
               >
@@ -94,7 +89,6 @@ export function HeatmapToolTip({
               </Block>
               <Block
                 className={"tool-tip_label is-center"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06120-fdb06106"}
                 tag={"div"}
                 {...adrLabelRuntimeProps}
               >
@@ -105,14 +99,12 @@ export function HeatmapToolTip({
               <HtmlEmbed
                 className={"arrowcircleup"}
                 content={""}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06116-fdb06106"}
                 value={
                   "%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20id%3D%22ArrowCircleUp%22%20data-name%3D%22ArrowCircleUp%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22currentColor%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%3Cpath%20d%3D%22M12%2C3C7%2C3%2C3%2C7%2C3%2C12s4%2C9%2C9%2C9%2C9-4%2C9-9S17%2C3%2C12%2C3ZM15.326%2C10.589c-.051.099-.153.161-.264.161h-1.437v3.856c0%2C.164-.133.297-.297.297h-2.658c-.164%2C0-.297-.133-.297-.296v-3.856s-1.436%2C0-1.436%2C0c-.111%2C0-.213-.062-.264-.161-.051-.099-.043-.218.022-.308l3.052-4.294c.056-.078.145-.125.241-.125h0c.096%2C0%2C.185.046.241.124l3.072%2C4.294c.065.091.074.21.023.308Z%22%2F%3E%0A%3C%2Fsvg%3E"
                 }
               />
               <Block
                 className={"tool-tip_metric is-currency"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06117-fdb06106"}
                 tag={"div"}
                 {...revenueMetricRuntimeProps}
               >
@@ -120,7 +112,6 @@ export function HeatmapToolTip({
               </Block>
               <Block
                 className={"tool-tip_label is-center"}
-                id={"w-node-ba531899-3fdb-bf94-11c5-a1defdb06119-fdb06106"}
                 tag={"div"}
                 {...revenueLabelRuntimeProps}
               >

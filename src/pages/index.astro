@@ -1,6 +1,9 @@
 
 
 
+
+
+
 ---
 import MainLayout from '../layouts/main.astro';
 import { baseUrl } from '../lib/base-url';
@@ -37,6 +40,38 @@ import FoundationIcon from '../components/FoundationIcon.astro';
             </p>
             <div class="flex items-center text-primary font-medium">
               View Dashboard
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        {/* Card-Based Dashboard */}
+        <a
+          href={`${baseUrl}/dashboard-cards`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <FoundationIcon name="fi-layout"  class="text-6xl text-primary" />
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
+              Card Dashboard
+            </h2>
+            <p class="text-muted-foreground text-primary">
+              Configurable dashboard with custom metric cards
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              View Cards
               <svg
                 class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
                 fill="none"
@@ -134,7 +169,19 @@ import FoundationIcon from '../components/FoundationIcon.astro';
           </li>
           <li class="flex items-start">
             <span class="text-primary mr-2">✓</span>
-            <span>Dynamic query templates</span>
+            <span>Data templates & metric definitions</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Formula-based metric calculations</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Visual card editor with drag-and-drop</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-primary mr-2">✓</span>
+            <span>Configurable dashboard cards</span>
           </li>
           <li class="flex items-start">
             <span class="text-primary mr-2">✓</span>
@@ -150,17 +197,16 @@ import FoundationIcon from '../components/FoundationIcon.astro';
           </li>
           <li class="flex items-start">
             <span class="text-primary mr-2">✓</span>
-            <span>Professional chart components</span>
-          </li>
-          <li class="flex items-start">
-            <span class="text-primary mr-2">✓</span>
-            <span>Statistics & metrics cards</span>
+            <span>Webflow KPI card components</span>
           </li>
         </ul>
       </div>
     </div>
   </div>
 </MainLayout>
+
+
+
 
 
 

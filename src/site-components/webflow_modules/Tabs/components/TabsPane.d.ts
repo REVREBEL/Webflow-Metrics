@@ -1,14 +1,16 @@
 import * as React from "react";
-type TabsPaneProps = React.PropsWithChildren<{
-  tag?: React.ElementType;
-  className?: string;
-  "data-w-tab": string;
-}>;
-export type { TabsPaneProps };
-declare const TabsPane: React.ForwardRefExoticComponent<
+import { Props } from "../../types";
+type TabsPaneProps = Props<
+  "div",
   {
     tag?: React.ElementType;
-    className?: string;
+    "data-w-tab": string;
+  }
+>;
+export type { TabsPaneProps };
+declare const TabsPane: React.ForwardRefExoticComponent<
+  import("../../types").ElementProps<"div"> & {
+    tag?: React.ElementType;
     "data-w-tab": string;
   } & {
     children?: React.ReactNode | undefined;

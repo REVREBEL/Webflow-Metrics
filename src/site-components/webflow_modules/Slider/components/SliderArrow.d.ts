@@ -1,12 +1,14 @@
 import * as React from "react";
-type SliderArrowProps = React.PropsWithChildren<{
-  className?: string;
-  dir: "left" | "right";
-}>;
+import { Props } from "../../types";
+type SliderArrowProps = Props<
+  "div",
+  {
+    dir: "left" | "right";
+  }
+>;
 export type { SliderArrowProps };
 declare const SliderArrow: React.ForwardRefExoticComponent<
-  {
-    className?: string;
+  import("../../types").ElementProps<"div"> & {
     dir: "left" | "right";
   } & {
     children?: React.ReactNode | undefined;

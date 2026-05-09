@@ -32,6 +32,7 @@ export const GET: APIRoute = async ({ locals }) => {
           dataset_id,
           table_id,
           data_location,
+          total_rooms,
           created_at,
           updated_at
         FROM hotels 
@@ -76,16 +77,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const body = await request.json() as {
-      hotel_code: string;
-      hotel_name: string;
-      project_id: string;
-      dataset_id?: string;
-      table_id?: string;
-      data_location: string;
-      service_account_json: string;
-    };
-    const { hotel_code, hotel_name, project_id, dataset_id, table_id, data_location, service_account_json } = body;
+    // Parse request body
+    const body = await request.json();
+    const { 
+      hotel_code, 
+      hotel_name, 
+      service_account_json, 
+      data_location,
+      project_id,
+      dataset_id,
+      table_id,
+      total_rooms
+    } = body;
 
     console.log('Creating/updating hotel:', { hotel_code, hotel_name, project_id, data_location });
 
@@ -152,10 +155,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             dataset_id, 
             table_id, 
             data_location, 
-            service_account_json, 
+            service_account_json,
+            total_rooms,
             created_at,
             updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
         )
         .bind(
           hotel_code,
@@ -164,14 +168,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
           dataset_id || null,
           table_id || null,
           data_location || 'US',
-          encryptedJson
+          encryptedJson,
+          total_rooms || null
         )
         .run();
     }
 
     // Verify it was saved by querying back (without returning credentials)
     const verify = await db
-      .prepare('SELECT id, hotel_code, hotel_name, project_id, dataset_id, table_id, data_location, created_at, updated_at FROM hotels WHERE hotel_code = ?')
+      .prepare('SELECT id, hotel_code, hotel_name, project_id, dataset_id, table_id, data_location, total_rooms, created_at, updated_at FROM hotels WHERE hotel_code = ?')
       .bind(hotel_code)
       .first();
 
@@ -237,6 +242,9 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+
+
 
 
 

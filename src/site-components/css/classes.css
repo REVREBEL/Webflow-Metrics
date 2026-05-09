@@ -1,4 +1,4 @@
-@scope (.wf-devlink-233db24260c4a1c8d57a05ae7dfc2bdb) {
+@scope (.wf-devlink-5ab29c5259c0c420755a136293b2282b) {
   .kpi-card_right {
     min-width: 50%;
     padding-left: 20px;
@@ -54,6 +54,19 @@
   }
   .kpi-card.add-shadow {
     min-width: 750px;
+    border-top-width: 2px;
+    border-top-color: var(--primary);
+    border-right-width: 2px;
+    border-right-color: var(--primary);
+    border-bottom-width: 2px;
+    border-bottom-color: var(--primary);
+    border-left-width: 2px;
+    border-left-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0.95px 0.5px 0px currentColor, 1.45px 1px 0px currentColor,
+      1.95px 1.5px 0px currentColor, 2.45px 2px 0px currentColor,
+      2.95px 2.5px 0px currentColor, 3.45px 3px 0px currentColor,
+      3.95px 3.5px 0px currentColor, 4.45px 4px 0px currentColor, 4.95px 4.5px;
   }
   .kpi-card_middle {
     display: flex;

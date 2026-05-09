@@ -1,13 +1,10 @@
 import React from "react";
-type FormSelectProps = {
-  options: Array<{
-    v: string;
-    t: string;
-  }>;
-};
 declare const FormSelect: React.ForwardRefExoticComponent<
-  React.SelectHTMLAttributes<HTMLSelectElement> &
-    FormSelectProps &
-    React.RefAttributes<unknown>
+  React.SelectHTMLAttributes<HTMLSelectElement> & {
+    options: Array<{
+      v: string;
+      t: string;
+    }>;
+  } & React.RefAttributes<HTMLSelectElement>
 >;
 export default FormSelect;

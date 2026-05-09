@@ -50,7 +50,6 @@ export function VarianceMetric({
         {varianceVisibility ? (
           <Block
             className={`metric-value is-var ${_activeStyleVariant}`}
-            id={"w-node-_3f59a15c-abcf-f1b8-a223-3e6a992160a8-992160a7"}
             tag={"div"}
             variance-format={varianceFormat}
             {...metricVarRuntimeProps}
@@ -61,7 +60,6 @@ export function VarianceMetric({
         {varianceLabelVisibility ? (
           <Block
             className={`metric-var-label ${_activeStyleVariant}`}
-            id={"w-node-d2cc834f-26c3-e814-89ce-ffacf77fe0d7-992160a7"}
             tag={"div"}
             variance-format={varianceFormat}
           >

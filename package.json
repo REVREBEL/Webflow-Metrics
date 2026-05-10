@@ -73,7 +73,7 @@
     "tailwindcss": "4.1.11",
     "vaul": "1.1.2",
     "webflow-api": "3.3.4",
-    "zod": "4.0.13"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",

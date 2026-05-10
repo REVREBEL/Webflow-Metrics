@@ -72,7 +72,7 @@
     "tailwind-merge": "3.3.1",
     "tailwindcss": "4.1.11",
     "vaul": "1.1.2",
-    "webflow-api": "3.2.0",
+    "webflow-api": "3.3.4",
     "zod": "4.0.13"
   },
   "devDependencies": {

@@ -28,3 +28,4 @@ pnpm-debug.log*
 .dev.vars*
 webflow.json
 lost+found/
+.wrangler/

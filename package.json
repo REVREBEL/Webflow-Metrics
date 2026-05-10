@@ -17,7 +17,7 @@
     "sync:main": "bash scripts/sync-main-to-dev.sh"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "12.6.13",
+    "@astrojs/cloudflare": "13.5.0",
     "@astrojs/react": "4.4.2",
     "@google-cloud/bigquery": "8.3.0",
     "@hookform/resolvers": "5.2.2",

@@ -1,62 +1,22 @@
 import type { APIRoute } from 'astro';
+import { BigQuery } from '@google-cloud/bigquery';
+import { decrypt } from '../../../../lib/encryption';
 
 const headers = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-/**
- * Query Templates V2 (Table-driven with visual builder support)
- */
-
-// GET: Fetch all templates with table information
-export const GET: APIRoute = async ({ locals }) => {
-  try {
-    const env = (locals as any).runtime?.env;
-    const db = env?.DB;
-
-    if (!db) {
-      return new Response(
-        JSON.stringify({ error: 'Database not configured' }),
-        { status: 500, headers }
-      );
-    }
-
-    const templates = await db
-      .prepare(`
-        SELECT 
-          t.*,
-          bt.table_name,
-          bt.table_key,
-          bt.full_table_path
-        FROM query_templates_v2 t
-        LEFT JOIN bigquery_tables bt ON t.table_id = bt.id
-        ORDER BY t.created_at DESC
-      `)
-      .all();
-
-    const result = (templates.results || []).map((t: any) => ({
-      ...t,
-      group_by_columns: t.group_by_columns ? JSON.parse(t.group_by_columns) : null,
-      filters: t.filters ? JSON.parse(t.filters) : null,
-    }));
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers,
-    });
-  } catch (error: any) {
-    console.error('Error fetching templates:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers }
-    );
-  }
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, { status: 204, headers });
 };
 
-// POST: Create new template
+/**
+ * Validate a data template by testing it against BigQuery
+ * This endpoint requires a hotel_code to get credentials for testing
+ */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const env = (locals as any).runtime?.env;
@@ -70,271 +30,237 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const body = await request.json() as {
-      template_name: string;
-      metric_name: string;
-      table_id: number;
+      hotel_code: string;
+      query_template: string;
+      output_columns: string[];
+      action?: 'validate' | 'save';
+      template_name?: string;
       description?: string;
-      use_custom_sql?: number;
-      custom_sql?: string;
-      aggregation_type?: string;
-      aggregation_column?: string;
-      group_by_columns?: string;
-      group_by_function?: string;
-      filters?: string;
+      template_id?: number;
     };
 
-    const {
+    const { 
+      hotel_code, 
+      query_template, 
+      output_columns,
+      action = 'validate',
       template_name,
-      metric_name,
-      table_id,
       description,
-      use_custom_sql,
-      custom_sql,
-      aggregation_type,
-      aggregation_column,
-      group_by_columns,
-      group_by_function,
-      filters,
+      template_id
     } = body;
 
-    if (!template_name || !metric_name || !table_id) {
+    if (!hotel_code || !query_template || !output_columns || output_columns.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'template_name, metric_name, and table_id are required' }),
+        JSON.stringify({ 
+          error: 'hotel_code, query_template, and output_columns are required' 
+        }),
         { status: 400, headers }
       );
     }
 
-    // Validate that either custom_sql or visual builder fields are provided
-    if (use_custom_sql && !custom_sql) {
-      return new Response(
-        JSON.stringify({ error: 'custom_sql is required when use_custom_sql is true' }),
-        { status: 400, headers }
-      );
-    }
-
-    if (!use_custom_sql && !aggregation_type) {
-      return new Response(
-        JSON.stringify({ error: 'aggregation_type is required for visual builder mode' }),
-        { status: 400, headers }
-      );
-    }
-
-    const result = await db
-      .prepare(
-        `INSERT INTO query_templates_v2 (
-          template_name, metric_name, table_id, description,
-          use_custom_sql, custom_sql,
-          aggregation_type, aggregation_column, group_by_columns, group_by_function, filters,
-          created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-      )
-      .bind(
-        template_name,
-        metric_name,
-        table_id,
-        description || null,
-        use_custom_sql || 0,
-        custom_sql || null,
-        aggregation_type || null,
-        aggregation_column || null,
-        group_by_columns || null,
-        group_by_function || null,
-        filters || null
-      )
-      .run();
-
-    // Fetch the created template
-    const template = await db
-      .prepare('SELECT * FROM query_templates_v2 WHERE id = ?')
-      .bind(result.meta.last_row_id)
+    // Get hotel configuration for testing
+    const hotelResult = await db
+      .prepare('SELECT * FROM hotels WHERE hotel_code = ?')
+      .bind(hotel_code)
       .first();
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        template,
-      }),
-      { status: 201, headers }
-    );
-  } catch (error: any) {
-    console.error('Error creating template:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers }
-    );
-  }
-};
-
-// PUT: Update existing template
-export const PUT: APIRoute = async ({ request, locals }) => {
-  try {
-    const env = (locals as any).runtime?.env;
-    const db = env?.DB;
-
-    if (!db) {
+    if (!hotelResult) {
       return new Response(
-        JSON.stringify({ error: 'Database not configured' }),
+        JSON.stringify({ error: 'Hotel not found' }),
+        { status: 404, headers }
+      );
+    }
+
+    const hotel = hotelResult as any;
+
+    // Decrypt service account
+    const encryptionKey = env?.ENCRYPTION_KEY;
+    if (!encryptionKey) {
+      return new Response(
+        JSON.stringify({ error: 'Encryption key not configured' }),
         { status: 500, headers }
       );
     }
 
-    const body = await request.json() as {
-      template_id: number;
-      template_name: string;
-      metric_name: string;
-      table_id: number;
-      description?: string;
-      use_custom_sql?: number;
-      custom_sql?: string;
-      aggregation_type?: string;
-      aggregation_column?: string;
-      group_by_columns?: string;
-      group_by_function?: string;
-      filters?: string;
+    const serviceAccountJson = await decrypt(hotel.service_account_json, encryptionKey);
+    const serviceAccount = JSON.parse(serviceAccountJson);
+
+    // Initialize BigQuery
+    const bigquery = new BigQuery({
+      projectId: hotel.project_id,
+      credentials: serviceAccount,
+    });
+
+    // Build test query with sample parameters
+    const testQuery = buildTestQuery(query_template, hotel);
+
+    // Execute query with LIMIT 1 to test structure
+    const validationQuery = `${testQuery} LIMIT 1`;
+    
+    let queryResult;
+    try {
+      [queryResult] = await bigquery.query({ query: validationQuery });
+    } catch (error: any) {
+      return new Response(
+        JSON.stringify({ 
+          valid: false,
+          error: 'Query execution failed',
+          details: error.message,
+          query: validationQuery
+        }),
+        { status: 400, headers }
+      );
+    }
+
+    // Get the actual columns returned by the query
+    const actualColumns = queryResult.length > 0 
+      ? Object.keys(queryResult[0])
+      : [];
+
+    // Check if declared columns match actual columns
+    const missingColumns = output_columns.filter(col => !actualColumns.includes(col));
+    const extraColumns = actualColumns.filter(col => !output_columns.includes(col));
+
+    const isValid = missingColumns.length === 0 && extraColumns.length === 0;
+
+    const validationResult = {
+      valid: isValid,
+      declaredColumns: output_columns,
+      actualColumns,
+      missingColumns,
+      extraColumns,
+      sampleRow: queryResult[0] || null,
+      message: isValid 
+        ? 'Query validation successful! All columns match.'
+        : 'Column mismatch detected. Please review the differences below.'
     };
 
-    const {
-      template_id,
-      template_name,
-      metric_name,
-      table_id,
-      description,
-      use_custom_sql,
-      custom_sql,
-      aggregation_type,
-      aggregation_column,
-      group_by_columns,
-      group_by_function,
-      filters,
-    } = body;
+    // If action is 'save' and validation passed, save the template
+    if (action === 'save' && isValid) {
+      if (!template_name) {
+        return new Response(
+          JSON.stringify({ error: 'template_name is required for save action' }),
+          { status: 400, headers }
+        );
+      }
 
-    if (!template_id || !template_name || !metric_name || !table_id) {
-      return new Response(
-        JSON.stringify({ error: 'template_id, template_name, metric_name, and table_id are required' }),
-        { status: 400, headers }
-      );
+      if (template_id) {
+        // Update existing template
+        await db
+          .prepare(
+            `UPDATE data_templates SET
+              template_name = ?,
+              description = ?,
+              query_template = ?,
+              output_columns = ?,
+              updated_at = datetime('now')
+            WHERE id = ?`
+          )
+          .bind(
+            template_name,
+            description || null,
+            query_template,
+            JSON.stringify(output_columns),
+            template_id
+          )
+          .run();
+
+        const updated = await db
+          .prepare('SELECT * FROM data_templates WHERE id = ?')
+          .bind(template_id)
+          .first();
+
+        return new Response(
+          JSON.stringify({
+            ...validationResult,
+            saved: true,
+            template: {
+              ...updated,
+              output_columns: JSON.parse((updated as any).output_columns)
+            }
+          }),
+          { status: 200, headers }
+        );
+      } else {
+        // Create new template
+        const result = await db
+          .prepare(
+            `INSERT INTO data_templates (
+              template_name,
+              description,
+              query_template,
+              output_columns,
+              created_at,
+              updated_at
+            ) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`
+          )
+          .bind(
+            template_name,
+            description || null,
+            query_template,
+            JSON.stringify(output_columns)
+          )
+          .run();
+
+        const created = await db
+          .prepare('SELECT * FROM data_templates WHERE id = ?')
+          .bind(result.meta.last_row_id)
+          .first();
+
+        return new Response(
+          JSON.stringify({
+            ...validationResult,
+            saved: true,
+            template: {
+              ...created,
+              output_columns: JSON.parse((created as any).output_columns)
+            }
+          }),
+          { status: 201, headers }
+        );
+      }
     }
 
-    // Validate that either custom_sql or visual builder fields are provided
-    if (use_custom_sql && !custom_sql) {
-      return new Response(
-        JSON.stringify({ error: 'custom_sql is required when use_custom_sql is true' }),
-        { status: 400, headers }
-      );
-    }
-
-    if (!use_custom_sql && !aggregation_type) {
-      return new Response(
-        JSON.stringify({ error: 'aggregation_type is required for visual builder mode' }),
-        { status: 400, headers }
-      );
-    }
-
-    await db
-      .prepare(
-        `UPDATE query_templates_v2 SET
-          template_name = ?,
-          metric_name = ?,
-          table_id = ?,
-          description = ?,
-          use_custom_sql = ?,
-          custom_sql = ?,
-          aggregation_type = ?,
-          aggregation_column = ?,
-          group_by_columns = ?,
-          group_by_function = ?,
-          filters = ?,
-          updated_at = datetime('now')
-        WHERE id = ?`
-      )
-      .bind(
-        template_name,
-        metric_name,
-        table_id,
-        description || null,
-        use_custom_sql || 0,
-        custom_sql || null,
-        aggregation_type || null,
-        aggregation_column || null,
-        group_by_columns || null,
-        group_by_function || null,
-        filters || null,
-        template_id
-      )
-      .run();
-
-    // Fetch the updated template
-    const template = await db
-      .prepare('SELECT * FROM query_templates_v2 WHERE id = ?')
-      .bind(template_id)
-      .first();
-
+    // Just return validation results
     return new Response(
-      JSON.stringify({
-        success: true,
-        template,
+      JSON.stringify(validationResult),
+      { status: isValid ? 200 : 400, headers }
+    );
+
+  } catch (error: any) {
+    console.error('Template validation error:', error);
+    return new Response(
+      JSON.stringify({ 
+        valid: false,
+        error: error.message,
+        stack: error.stack
       }),
-      { status: 200, headers }
-    );
-  } catch (error: any) {
-    console.error('Error updating template:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
       { status: 500, headers }
     );
   }
 };
 
-// DELETE: Remove a template
-export const DELETE: APIRoute = async ({ request, locals }) => {
-  try {
-    const env = (locals as any).runtime?.env;
-    const db = env?.DB;
+function buildTestQuery(template: string, hotel: any): string {
+  let query = template;
 
-    if (!db) {
-      return new Response(
-        JSON.stringify({ error: 'Database not configured' }),
-        { status: 500, headers }
-      );
-    }
+  // Replace placeholders with test values
+  query = query.replace(/\{project_id\}/g, hotel.project_id);
+  query = query.replace(/\{dataset_id\}/g, hotel.dataset_id);
+  
+  // Use current year/month for testing
+  const now = new Date();
+  const year = now.getFullYear().toString();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  
+  query = query.replace(/\{year\}/g, year);
+  query = query.replace(/\{month\}/g, month);
 
-    const url = new URL(request.url);
-    const templateId = url.searchParams.get('template_id');
+  // Replace @parameters with test values
+  query = query.replace(/@hotel_code/g, `'${hotel.hotel_code}'`);
+  query = query.replace(/@start_date/g, `'${year}-${month}-01'`);
+  query = query.replace(/@end_date/g, `'${year}-${month}-28'`);
+  query = query.replace(/@year/g, year);
+  query = query.replace(/@month/g, month);
 
-    if (!templateId) {
-      return new Response(
-        JSON.stringify({ error: 'template_id parameter is required' }),
-        { status: 400, headers }
-      );
-    }
-
-    await db
-      .prepare('DELETE FROM query_templates_v2 WHERE id = ?')
-      .bind(parseInt(templateId))
-      .run();
-
-    return new Response(
-      JSON.stringify({ success: true }),
-      { status: 200, headers }
-    );
-  } catch (error: any) {
-    console.error('Error deleting template:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers }
-    );
-  }
-};
-
-export const OPTIONS: APIRoute = async () => {
-  return new Response(null, {
-    status: 204,
-    headers,
-  });
-};
-
-
-
-
-
-
+  return query;
+}

@@ -14,16 +14,16 @@
   --color-7-inverse: var(--color-4);
   --kpi-card-border-raduis: 8px;
   --color-4: #b2d3de;
-  --color-1: #047c97;
-  --color-3: #71c9c5;
   --color-5: #faca78;
   --color-6: #f37d59;
-  --dark-3: color-mix(in srgb, var(--dark-1) 60%, white 40%);
   --variance-font-size-base: calc(var(--metric-font-size-base) * 0.85);
   --metric-font-size-base: 1.15rem;
   --label-label-font: Khand, Impact, sans-serif;
   --label-label-font-weight: 650;
   --variance-label-size-base: calc(var(--metric-font-size-base) * 0.75);
+  --btn-sm-text-size: 0.85rem;
+  --input-font: Supreme, Tahoma, sans-serif;
+  --_apps---font--headline: Khand, Impact, sans-serif;
   --label-padding-left: 0.3em;
   --btn-radius: 2px;
   --tag-radius: 0.35rem;
@@ -102,7 +102,6 @@
   --raduis-sm: 0.25rem;
   --raduis-xl: 1rem;
   --max-width-xs: 900px;
-  --_apps---font--headline: Khand, Impact, sans-serif;
   --_apps---font--body: "General Sans", Tahoma, sans-serif;
   --_apps---font--button: Khand, Impact, sans-serif;
   --_apps---font--metrics: Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -177,7 +176,6 @@
   --_apps---metrics--group: var(--color-1);
   --_apps---metrics--group-inverse: var(--color-3);
   --form-padding: 1.5rem;
-  --input-font: Supreme, Tahoma, sans-serif;
   --input-font-weight: 400;
   --input-font-size: 1rem;
   --input-font-height: 1.5;
@@ -186,6 +184,8 @@
   --input-padding-horizontal: 1rem;
   --placeholder-font-size: 0.85rem;
   --placeholder-font-weight: 300;
+  --color-1: #047c97;
+  --color-3: #71c9c5;
   --color-8: #8e456a;
   --grey-1: #ababab;
   --grey-2: #575757;
@@ -193,6 +193,7 @@
   --light-2: color-mix(in srgb, var(--light-1) 80%, black 10%);
   --light-3: color-mix(in srgb, var(--light-1) 80%, black 20%);
   --dark-2: color-mix(in srgb, var(--dark-1) 80%, white 20%);
+  --dark-3: color-mix(in srgb, var(--dark-1) 60%, white 40%);
   --alert: #e05047;
   --error: #e05047;
   --success: #00a6b6;
@@ -690,7 +691,6 @@
   --btn-sm-padding-bottom: 1rem;
   --btn-sm-padding-left: 1rem;
   --btn-sm-padding-right: 1rem;
-  --btn-sm-text-size: 0.85rem;
   --btn-sm-border-width: 2px;
   --btn-sm-weight: 400;
   --btn-sm-radius: 1.25px;

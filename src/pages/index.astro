@@ -153,6 +153,70 @@ import FoundationIcon from '../components/FoundationIcon.astro';
             </div>
           </div>
         </a>
+
+        {/* Card Configuration Test */}
+        <a
+          href={`${baseUrl}/test-card-config`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <FoundationIcon name="fi-widget"  class="text-6xl text-primary" />
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
+              Card Config Test
+            </h2>
+            <p class="text-muted-foreground text-primary">
+              Test the configurable card backend - create and manage dashboard cards
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              Test Config
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        {/* Chart Configurator */}
+        <a
+          href={`${baseUrl}/test-chart-config`}
+          class="group block p-8 bg-card border border-border rounded-lg hover:border-primary transition-all hover:shadow-lg"
+        >
+          <div class="space-y-4">
+            <FoundationIcon name="fi-graph-trending"  class="text-6xl text-primary" />
+            <h2 class="text-2xl font-bold font-heading group-hover text-primary transition-colors">
+              Chart Configurator
+            </h2>
+            <p class="text-muted-foreground text-primary">
+              Interactive chart configuration using Webflow input components
+            </p>
+            <div class="flex items-center text-primary font-medium">
+              Configure Charts
+              <svg
+                class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </div>
+        </a>
       </div>
 
       {/* Features */}
@@ -204,6 +268,8 @@ import FoundationIcon from '../components/FoundationIcon.astro';
     </div>
   </div>
 </MainLayout>
+
+
 
 
 

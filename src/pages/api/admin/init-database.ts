@@ -94,6 +94,7 @@ export const POST: APIRoute = async ({ locals }) => {
         table_id TEXT,
         data_location TEXT NOT NULL DEFAULT 'US',
         service_account_json TEXT NOT NULL,
+        total_rooms INTEGER DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
@@ -389,6 +390,7 @@ export const OPTIONS: APIRoute = async () => {
     },
   });
 };
+
 
 
 

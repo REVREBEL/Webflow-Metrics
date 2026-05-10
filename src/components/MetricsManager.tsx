@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { baseUrl } from '../lib/base-url';
+import MetricDiscovery from './MetricDiscovery';
 import { Table, TableBody, TableCell, TableRow } from './ui/table';
 
 interface DataTemplate {
@@ -193,6 +194,10 @@ export default function MetricsManager() {
 
   return (
     <div className="space-y-6">
+      {/* Metric Discovery - shows when new metrics are found */}
+      <MetricDiscovery onComplete={loadData} />
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold font-heading">Metrics Manager</h2>
@@ -556,6 +561,65 @@ function TemplateForm({
     output_columns: template?.output_columns.join(', ') || ''
   });
   const [saving, setSaving] = useState(false);
+  const [validating, setValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const [hotels, setHotels] = useState<any[]>([]);
+  const [selectedHotel, setSelectedHotel] = useState('');
+
+  // Load hotels for validation
+  useEffect(() => {
+    const loadHotels = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/api/admin/hotels`);
+        if (res.ok) {
+          const data = await res.json();
+          setHotels(data);
+          if (data.length > 0) {
+            setSelectedHotel(data[0].hotel_code);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading hotels:', error);
+      }
+    };
+    loadHotels();
+  }, []);
+
+  const handleValidate = async () => {
+    if (!selectedHotel) {
+      alert('Please select a hotel for validation');
+      return;
+    }
+
+    setValidating(true);
+    setValidationResult(null);
+
+    try {
+      const columns = formData.output_columns.split(',').map(c => c.trim()).filter(c => c);
+      
+      const res = await fetch(`${baseUrl}/api/admin/templates/v2`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hotel_code: selectedHotel,
+          query_template: formData.query_template,
+          output_columns: columns,
+          action: 'validate'
+        })
+      });
+
+      const result = await res.json();
+      setValidationResult(result);
+    } catch (error) {
+      console.error('Validation error:', error);
+      setValidationResult({
+        valid: false,
+        error: 'Network error during validation'
+      });
+    } finally {
+      setValidating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -629,7 +693,7 @@ function TemplateForm({
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Use @hotel_code, @year, @month as parameters
+              Use {'{project_id}'}, {'{dataset_id}'}, @hotel_code, @start_date, @end_date as placeholders
             </p>
           </div>
 
@@ -642,6 +706,99 @@ function TemplateForm({
               placeholder="revenue, rooms_sold, rooms_available"
               required
             />
+          </div>
+
+          {/* Validation Section */}
+          <div className="border-t pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Label htmlFor="validation_hotel">Test Query Against Hotel:</Label>
+              <Select value={selectedHotel} onValueChange={setSelectedHotel}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select hotel" />
+                </SelectTrigger>
+                <SelectContent>
+                  {hotels.map(h => (
+                    <SelectItem key={h.hotel_code} value={h.hotel_code}>
+                      {h.hotel_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleValidate}
+                disabled={validating || !selectedHotel}
+              >
+                {validating ? 'Validating...' : '🔍 Validate Query'}
+              </Button>
+            </div>
+
+            {validationResult && (
+              <div className={`mt-3 p-4 rounded-lg border ${
+                validationResult.valid 
+                  ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' 
+                  : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+              }`}>
+                <div className="flex items-start gap-2">
+                  <span className="text-xl">
+                    {validationResult.valid ? '✅' : '❌'}
+                  </span>
+                  <div className="flex-1">
+                    <h4 className="font-semibold mb-2">{validationResult.message}</h4>
+                    
+                    {validationResult.error && (
+                      <div className="text-sm mb-2">
+                        <strong>Error:</strong> {validationResult.error}
+                        {validationResult.details && (
+                          <pre className="mt-1 text-xs bg-black/10 p-2 rounded overflow-auto">
+                            {validationResult.details}
+                          </pre>
+                        )}
+                      </div>
+                    )}
+
+                    {validationResult.missingColumns && validationResult.missingColumns.length > 0 && (
+                      <div className="text-sm mb-2">
+                        <strong>Missing columns:</strong> {validationResult.missingColumns.join(', ')}
+                        <p className="text-xs mt-1">These columns are declared but not returned by the query</p>
+                      </div>
+                    )}
+
+                    {validationResult.extraColumns && validationResult.extraColumns.length > 0 && (
+                      <div className="text-sm mb-2">
+                        <strong>Extra columns:</strong> {validationResult.extraColumns.join(', ')}
+                        <p className="text-xs mt-1">These columns are returned but not declared</p>
+                      </div>
+                    )}
+
+                    {validationResult.actualColumns && (
+                      <details className="text-sm mt-2">
+                        <summary className="cursor-pointer font-medium">
+                          Actual columns returned ({validationResult.actualColumns.length})
+                        </summary>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {validationResult.actualColumns.map((col: string) => (
+                            <Badge key={col} variant="secondary">{col}</Badge>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+
+                    {validationResult.sampleRow && (
+                      <details className="text-sm mt-2">
+                        <summary className="cursor-pointer font-medium">
+                          Sample data row
+                        </summary>
+                        <pre className="mt-2 text-xs bg-black/10 p-2 rounded overflow-auto">
+                          {JSON.stringify(validationResult.sampleRow, null, 2)}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2">
@@ -813,6 +970,13 @@ function MetricForm({
             <div className="bg-muted p-3 rounded text-sm">
               <Label className="text-xs">Available columns (click to insert):</Label>
               <div className="flex flex-wrap gap-1 mt-1">
+                <Badge 
+                  variant="outline"
+                  className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={() => insertColumnIntoFormula('ROOM_COUNT')}
+                >
+                  ROOM_COUNT
+                </Badge>
                 {selectedTemplate.output_columns.map(col => (
                   <Badge 
                     key={col} 
@@ -839,7 +1003,7 @@ function MetricForm({
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Click column badges above to insert. Use +, -, *, / operators.
+              Click column badges above to insert. Use +, -, *, / operators. ROOM_COUNT uses the hotel's total rooms.
             </p>
           </div>
 
@@ -939,6 +1103,11 @@ function MetricForm({
     </Card>
   );
 }
+
+
+
+
+
 
 
 

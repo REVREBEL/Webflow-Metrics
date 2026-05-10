@@ -27,6 +27,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
       SELECT 
         m.id,
         m.metric_name,
+        m.display_name,
         m.data_template_id,
         m.formula,
         m.format_type,
@@ -89,6 +90,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const body = await request.json() as {
       metric_name: string;
+      display_name?: string;
       data_template_id: number;
       formula: string;
       format_type?: string;
@@ -102,6 +104,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const {
       metric_name,
+      display_name,
       data_template_id,
       formula,
       format_type = 'number',
@@ -125,6 +128,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       .prepare(
         `INSERT INTO metric_definitions (
           metric_name,
+          display_name,
           data_template_id,
           formula,
           format_type,
@@ -136,10 +140,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
           description,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
       )
       .bind(
         metric_name,
+        display_name || metric_name,
         data_template_id,
         formula,
         format_type,
@@ -201,6 +206,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     const body = await request.json() as {
       id: number;
       metric_name: string;
+      display_name?: string;
       data_template_id: number;
       formula: string;
       format_type?: string;
@@ -215,6 +221,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     const {
       id,
       metric_name,
+      display_name,
       data_template_id,
       formula,
       format_type = 'number',
@@ -237,6 +244,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       .prepare(
         `UPDATE metric_definitions SET
           metric_name = ?,
+          display_name = ?,
           data_template_id = ?,
           formula = ?,
           format_type = ?,
@@ -251,6 +259,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       )
       .bind(
         metric_name,
+        display_name || metric_name,
         data_template_id,
         formula,
         format_type,
@@ -342,6 +351,10 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+
+
+
 
 
 

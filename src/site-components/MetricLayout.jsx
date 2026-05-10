@@ -123,16 +123,15 @@ export function MetricLayout({
             className={`metric-value add-front-padding ${_activeStyleVariant}`}
             metric-format={metricFormat}
             tag={"div"}
-            {...metricRuntimeProps}
           >
-            {metricSlot ?? "0.00"}
+            {"0.00"}
           </Block>
           <VarianceMetric
             iconTrendIRuntimeProps={iconTrendRuntimeProps}
-            iconTrendISlot={iconTrendSlot}
+            iconTrendISlot={""}
             iconTrendVisibility={iconTrendVisibility}
             metricVarRuntimeProps={metricVarRuntimeProps}
-            metricVarSlot={metricVarSlot}
+            metricVarSlot={""}
             varianceFormat={varianceFormat}
             varianceLabel={varianceLabel}
             varianceLabelVisibility={varianceLabelVisibility}

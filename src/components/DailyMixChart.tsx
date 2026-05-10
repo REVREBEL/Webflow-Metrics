@@ -16,7 +16,7 @@ interface DailyMixChartProps {
  * which removes it from the layout tree and causes rendering issues.
  * This version renders the .bar-mix-card directly.
  */
-export function DailyMixChart({
+export default function DailyMixChart({
   title = "Daily Mix Chart",
   metric1Label = "Transient",
   metric2Label = "Group",

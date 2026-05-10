@@ -1,6 +1,6 @@
 import React from 'react';
 import { DevLinkProvider } from '../site-components/DevLinkProvider';
-import { DailyMixChart } from './DailyMixChart';
+import DailyMixChart from './DailyMixChart';
 
 export default function WebflowChartTest() {
   console.log('WebflowChartTest rendering');

@@ -17,8 +17,8 @@
     "sync:main": "bash scripts/sync-main-to-dev.sh"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "13.5.0",
-    "@astrojs/react": "4.4.2",
+    "@astrojs/cloudflare": "^12.6.13",
+    "@astrojs/react": "^4.4.2",
     "@google-cloud/bigquery": "8.3.0",
     "@hookform/resolvers": "5.2.2",
     "@radix-ui/react-accordion": "1.2.12",
@@ -50,7 +50,7 @@
     "@types/react": "19.1.9",
     "@types/react-dom": "19.1.7",
     "apache-arrow": "21.1.0",
-    "astro": "6.3.1",
+    "astro": "^5.18.1",
     "astro-icon": "1.1.5",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -75,7 +75,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",
-    "@astrojs/tailwind": "6.0.2",
+    "@astrojs/tailwind": "^6.0.2",
     "@babel/preset-typescript": "7.28.5",
     "autoprefixer": "10.5.0",
     "kill-port": "2.0.1",

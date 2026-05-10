@@ -29,3 +29,11 @@ pnpm-debug.log*
 webflow.json
 lost+found/
 .wrangler/
+
+
+node_modules/
+dist/
+.astro/
+.wrangler/
+.tmp/
+.tmp_copy/

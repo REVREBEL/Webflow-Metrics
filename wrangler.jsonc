@@ -1,120 +1,105 @@
-
 /**
  * For more details on how to configure Wrangler, refer to:
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "astro",
-	"main": "./dist/_worker.js/index.js",
-	"compatibility_date": "2025-04-15",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./dist"
-	},
-	/**
-	 * D1 Database Binding
-	 * Cloudflare D1 serverless SQL database for hotel configurations, query templates, and dashboard settings.
-	 * 
-	 * ✅ DEPLOYMENT TO WEBFLOW CLOUD:
-	 * - database_id can stay as "your-database-id" (placeholder)
-	 * - Webflow Cloud auto-provisions D1 database on first deployment
-	 * - Migrations in migrations/ folder run automatically
-	 * - No manual setup required!
-	 * 
-	 * 🔧 LOCAL DEVELOPMENT (optional):
-	 * 1. Create database: npx wrangler d1 create bigquery-dashboard
-	 * 2. Copy the database_id from the output
-	 * 3. Replace "your-database-id" below with the actual ID
-	 * 4. Initialize schema: npx wrangler d1 execute DB --local --file=./schema.sql
-	 * 
-	 * ⚠️ IMPORTANT: 
-	 * - For Webflow Cloud deployment, you do NOT need to change database_id
-	 * - Database is created automatically based on database_name
-	 * - Schema migrations run from migrations/ folder on deployment
-	 * 
-	 * Access in code: locals.runtime.env.DB
-	 */
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "bigquery-dashboard",
-			"database_id": "your-database-id",
-			"migrations_dir": "migrations/"
-		}
-	],
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 * 
-	 * ENCRYPTION_KEY: Used to encrypt/decrypt sensitive data in D1 (e.g., service account JSON)
-	 * - Set this in Webflow Cloud dashboard under App Settings > Environment Variables
-	 * - Must be at least 32 characters long
-	 * - Use a strong, random key (e.g., generated with: openssl rand -base64 32)
-	 * 
-	 * OPTIONAL VARIABLES:
-	 * - WEBFLOW_CMS_SITE_API_TOKEN (if using CMS)
-	 * - WEBFLOW_API_HOST (for testing)
-	 */
-	"vars": {
-		"ENCRYPTION_KEY": "PLEASE_SET_IN_WEBFLOW_CLOUD_DASHBOARD"
-	},
-	"observability": {
-		"enabled": true
-	}
-	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": { "mode": "smart" },
+  "name": "webflow-astro-app",
+  "main": "./astro.config.mjs",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  /**
+   * D1 Database Binding
+   * Cloudflare D1 serverless SQL database for hotel configurations, query templates, and dashboard settings.
+   * * ✅ DEPLOYMENT TO WEBFLOW CLOUD:
+   * - database_id can stay as "your-database-id" (placeholder)
+   * - Webflow Cloud auto-provisions D1 database on first deployment
+   * - Migrations in migrations/ folder run automatically
+   * - No manual setup required!
+   * * 🔧 LOCAL DEVELOPMENT (optional):
+   * 1. Create database: npx wrangler d1 create bigquery-dashboard
+   * 2. Copy the database_id from the output
+   * 3. Replace "your-database-id" below with the actual ID
+   * 4. Initialize schema: npx wrangler d1 execute DB --local --file=./schema.sql
+   * * ⚠️ IMPORTANT: 
+   * - For Webflow Cloud deployment, you do NOT need to change database_id
+   * - Database is created automatically based on database_name
+   * - Schema migrations run from migrations/ folder on deployment
+   * * Access in code: locals.runtime.env.DB
+   */
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bigquery-dashboard",
+      "database_id": "your-database-id",
+      "migrations_dir": "migrations/"
+    }
+  ],
+  /**
+   * Environment Variables
+   * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+   * * ENCRYPTION_KEY: Used to encrypt/decrypt sensitive data in D1 (e.g., service account JSON)
+   * - Set this in Webflow Cloud dashboard under App Settings > Environment Variables
+   * - Must be at least 32 characters long
+   * - Use a strong, random key (e.g., generated with: openssl rand -base64 32)
+   * * OPTIONAL VARIABLES:
+   * - WEBFLOW_CMS_SITE_API_TOKEN (if using CMS)
+   * - WEBFLOW_API_HOST (for testing)
+   */
+  "vars": {
+    "ENCRYPTION_KEY": "PLEASE_SET_IN_WEBFLOW_CLOUD_DASHBOARD"
+  },
+  "observability": {
+    "enabled": true
+  }
+  /**
+   * Smart Placement
+   * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+   */
+  // "placement": { "mode": "smart" },
 
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
+  /**
+   * Bindings
+   * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
+   * databases, object storage, AI inference, real-time communication and more.
+   * https://developers.cloudflare.com/workers/runtime-apis/bindings/
+   */
 
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
+  /**
+   * Note: Use secrets to store sensitive data.
+   * https://developers.cloudflare.com/workers/configuration/secrets/
+   */
 
-	/**
-	 * R2 Object Storage (for future media uploads)
-	 * Uncomment if you need to store images/files uploaded by users.
-	 */
-	// "r2_buckets": [
-	//   {
-	//     "binding": "MEDIA_BUCKET",
-	//     "bucket_name": "bigquery-dashboard-media"
-	//   }
-	// ],
+  /**
+   * R2 Object Storage (for future media uploads)
+   * Uncomment if you need to store images/files uploaded by users.
+   */
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MEDIA_BUCKET",
+  //     "bucket_name": "bigquery-dashboard-media"
+  //   }
+  // ],
 
-	/**
-	 * KV Namespace (for caching/session state)
-	 * Uncomment if you need key-value storage for caching or feature flags.
-	 */
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "KV",
-	//     "id": "your-kv-namespace-id"
-	//   }
-	// ],
+  /**
+   * KV Namespace (for caching/session state)
+   * Uncomment if you need key-value storage for caching or feature flags.
+   */
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "KV",
+  //     "id": "your-kv-namespace-id"
+  //   }
+  // ],
 
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
-
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+  /**
+   * Service Bindings (communicate between multiple Workers)
+   * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
+   */
+  // "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }
-

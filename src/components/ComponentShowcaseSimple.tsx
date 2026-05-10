@@ -1,12 +1,14 @@
 import React from 'react';
-import { DashboardShell, DashboardHeader, DashboardContent, DashboardGrid } from './dashboard';
 import { StatsCard, MetricCard } from './statistics';
-import { AreaChart, BarChart, LineChart } from './charts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Area, AreaChart, Bar, BarChart, Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { KpiCardWithData } from './KpiCardWithData';
 import { DevLinkProvider } from '../site-components/DevLinkProvider';
+import DailyMixChart from './DailyMixChart';
 
 export function ComponentShowcaseSimple() {
+  console.log('ComponentShowcaseSimple rendering - complete with Daily Mix');
+  
   // Sample data for charts
   const sampleChartData = [
     { name: 'Jan', value: 4000, revenue: 2400 },
@@ -16,15 +18,142 @@ export function ComponentShowcaseSimple() {
     { name: 'May', value: 1890, revenue: 4800 },
     { name: 'Jun', value: 2390, revenue: 3800 },
   ];
-
+  
   return (
     <DevLinkProvider>
-      <DashboardShell>
-        <DashboardContent>
-          <DashboardHeader
-            heading="Component Showcase"
-            description="All available chart and statistic components for your dashboard"
-          />
+      <div className="min-h-screen bg-background p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-4xl font-bold font-heading">Component Showcase</h1>
+            <p className="text-muted-foreground mt-2">All available chart and statistic components</p>
+          </div>
+
+          {/* Statistics Cards Section */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-heading font-bold">Statistics Cards</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatsCard
+                title="Total Revenue"
+                value="$45,231"
+                description="+20.1% from last month"
+                trend="up"
+              />
+              <StatsCard
+                title="Bookings"
+                value="2,350"
+                description="+180 from last month"
+                trend="up"
+              />
+              <StatsCard
+                title="Occupancy"
+                value="85.2%"
+                description="-2% from last month"
+                trend="down"
+              />
+              <StatsCard
+                title="ADR"
+                value="$195"
+                description="+$12 from last month"
+                trend="up"
+              />
+            </div>
+          </section>
+
+          {/* Metric Cards Section */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-heading font-bold">Metric Cards</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              <MetricCard
+                title="Revenue"
+                value="$45,231"
+                change={20.1}
+                changeLabel="from last month"
+              />
+              <MetricCard
+                title="Guests"
+                value="1,234"
+                change={-5.2}
+                changeLabel="from last month"
+              />
+              <MetricCard
+                title="RevPAR"
+                value="$166"
+                change={15.3}
+                changeLabel="from last month"
+              />
+            </div>
+          </section>
+
+          {/* Charts Section */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-heading font-bold">Charts</h2>
+            
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Area Chart</CardTitle>
+                  <CardDescription>Monthly revenue trend</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={sampleChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="revenue" stroke="hsl(var(--chart-1))" fill="hsl(var(--chart-1))" fillOpacity={0.3} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bar Chart</CardTitle>
+                  <CardDescription>Bookings by month</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={sampleChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="hsl(var(--chart-2))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Line Chart</CardTitle>
+                  <CardDescription>Revenue vs Bookings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={sampleChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="revenue" stroke="hsl(var(--chart-1))" strokeWidth={2} />
+                      <Line type="monotone" dataKey="value" stroke="hsl(var(--chart-2))" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Daily Mix Chart Section */}
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-heading font-bold">Daily Mix Chart</h2>
+              <p className="text-muted-foreground">Stacked bar chart showing transient vs group bookings with weekend highlighting</p>
+            </div>
+            <DailyMixChart hotelCode="DEMO" year={2024} month={1} />
+          </section>
 
           {/* KPI Card with Concentric Donut Chart */}
           <section className="space-y-6">
@@ -55,122 +184,22 @@ export function ComponentShowcaseSimple() {
               />
             </div>
           </section>
-
-          {/* Statistics Cards Section */}
-          <section className="space-y-4 mb-8">
-            <h2 className="text-2xl font-heading font-bold">Statistics Cards</h2>
-            <DashboardGrid columns={4}>
-              <StatsCard
-                title="Total Revenue"
-                value="$45,231"
-                description="+20.1% from last month"
-                trend="up"
-              />
-              <StatsCard
-                title="Bookings"
-                value="2,350"
-                description="+180 from last month"
-                trend="up"
-              />
-              <StatsCard
-                title="Occupancy"
-                value="85.2%"
-                description="-2% from last month"
-                trend="down"
-              />
-              <StatsCard
-                title="ADR"
-                value="$195"
-                description="+$12 from last month"
-                trend="up"
-              />
-            </DashboardGrid>
-          </section>
-
-          {/* Metric Cards Section */}
-          <section className="space-y-4 mb-8">
-            <h2 className="text-2xl font-heading font-bold">Metric Cards</h2>
-            <DashboardGrid columns={3}>
-              <MetricCard
-                title="Revenue"
-                value="$45,231"
-                change={20.1}
-                changeLabel="from last month"
-              />
-              <MetricCard
-                title="Guests"
-                value="1,234"
-                change={-5.2}
-                changeLabel="from last month"
-              />
-              <MetricCard
-                title="RevPAR"
-                value="$166"
-                change={15.3}
-                changeLabel="from last month"
-              />
-            </DashboardGrid>
-          </section>
-
-          {/* Charts Section */}
-          <section className="space-y-4 mb-8">
-            <h2 className="text-2xl font-heading font-bold">Charts</h2>
-            
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Area Chart</CardTitle>
-                  <CardDescription>Monthly revenue trend</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <AreaChart
-                    data={sampleChartData}
-                    xKey="name"
-                    yKey="revenue"
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bar Chart</CardTitle>
-                  <CardDescription>Bookings by month</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <BarChart
-                    data={sampleChartData}
-                    xKey="name"
-                    yKey="value"
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Line Chart</CardTitle>
-                  <CardDescription>Revenue vs Bookings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <LineChart
-                    data={sampleChartData}
-                    xKey="name"
-                    lines={[
-                      { key: 'revenue', color: 'hsl(var(--chart-1))' },
-                      { key: 'value', color: 'hsl(var(--chart-2))' }
-                    ]}
-                    height={300}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-        </DashboardContent>
-      </DashboardShell>
+        </div>
+      </div>
     </DevLinkProvider>
   );
 }
+
+export default ComponentShowcaseSimple;
+
+
+
+
+
+
+
+
+
 
 
 

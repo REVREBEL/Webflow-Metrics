@@ -13,12 +13,21 @@ interface Migration {
 }
 
 // Pre-defined migrations that can be run
-const AVAILABLE_MIGRATIONS: Migration[] = [
+const AVAILABLE_MIGRATIONS = [
   {
-    name: 'Add group_by_function column',
-    description: 'Adds support for date grouping granularity (Day, Week, Month, Quarter, Year) in query templates',
-    sql: 'ALTER TABLE query_templates_v2 ADD COLUMN group_by_function TEXT',
-    version: '0005'
+    id: 'add_display_name',
+    name: 'Add display_name column to metric_definitions',
+    description: 'Adds display_name column to allow user-friendly metric names',
+    sql: `-- Check and add display_name column
+PRAGMA table_info(metric_definitions);
+
+-- Add column (will fail gracefully if exists)
+ALTER TABLE metric_definitions ADD COLUMN display_name TEXT;
+
+-- Populate display_name from metric_name for existing records
+UPDATE metric_definitions 
+SET display_name = REPLACE(REPLACE(UPPER(SUBSTR(metric_name, 1, 1)) || SUBSTR(metric_name, 2), '_', ' '), 'Adr', 'ADR')
+WHERE display_name IS NULL OR display_name = '';`,
   },
   // Future migrations can be added here
 ];
@@ -258,3 +267,5 @@ SELECT COUNT(*) FROM query_templates_v2;`;
     </div>
   );
 }
+
+

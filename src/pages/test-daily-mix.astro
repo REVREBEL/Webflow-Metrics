@@ -1,0 +1,70 @@
+---
+import MainLayout from '../layouts/main.astro';
+import DailyMixChart from '../components/DailyMixChart';
+---
+
+<MainLayout>
+  <div class="min-h-screen bg-background p-8">
+    <div class="max-w-6xl mx-auto space-y-8">
+      <div>
+        <h1 class="text-4xl font-bold font-heading mb-2">Daily Mix Chart</h1>
+        <p class="text-muted-foreground">
+          Stacked bar chart showing transient and group bookings by day
+        </p>
+      </div>
+
+      <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold font-heading mb-4">
+          May 2024 - Room Mix by Day
+        </h2>
+        <DailyMixChart 
+          client:only="react"
+          hotelCode="DEMO"
+          year={2024}
+          month={5}
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="bg-card border border-border rounded-lg p-4">
+          <h3 class="font-semibold mb-2">Weekday Colors</h3>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 rounded" style="background-color: hsl(var(--chart-3))"></div>
+              <span>Transient (chart-3)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 rounded" style="background-color: hsl(var(--chart-4))"></div>
+              <span>Group (chart-4)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-card border border-border rounded-lg p-4">
+          <h3 class="font-semibold mb-2">Weekend Colors</h3>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 rounded" style="background-color: hsl(var(--chart-5))"></div>
+              <span>Transient (chart-5)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 rounded" style="background-color: hsl(var(--destructive))"></div>
+              <span>Group (destructive - used as chart-6)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-muted rounded-lg p-4 text-sm">
+        <h3 class="font-semibold mb-2">Chart Features</h3>
+        <ul class="space-y-1 text-muted-foreground">
+          <li>✓ Stacked bars showing transient + group bookings</li>
+          <li>✓ Different colors for weekdays vs weekends</li>
+          <li>✓ X-axis shows day of month (1-31)</li>
+          <li>✓ Responsive design</li>
+          <li>✓ Interactive tooltips</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</MainLayout>

@@ -7,6 +7,12 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+const migrations = [
+  { file: '0007_metric_definitions.sql', name: 'Create metric definition tables' },
+  { file: '0008_default_metrics.sql', name: 'Add default metrics' },
+  { file: '0010_add_display_name.sql', name: 'Add display_name column' }
+];
+
 /**
  * Run database migration SQL
  * Supports both single statements and multiple statements separated by semicolons
@@ -133,3 +139,4 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+

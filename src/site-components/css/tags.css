@@ -5,4 +5,10 @@
     font-size: 14px;
     line-height: 20px;
   }
+  h1 {
+    margin-bottom: 10px;
+    font-size: 38px;
+    line-height: 1;
+    font-weight: 700;
+  }
 }

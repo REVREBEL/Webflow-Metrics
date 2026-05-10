@@ -44,6 +44,9 @@ export function AdminPanel() {
   const [success, setSuccess] = useState<string | null>(null);
   const [dbInitialized, setDbInitialized] = useState<boolean | null>(null);
   const [initializingDb, setInitializingDb] = useState(false);
+  const [migratingDb, setMigratingDb] = useState(false);
+  const [exportingConfig, setExportingConfig] = useState(false);
+  const [importingConfig, setImportingConfig] = useState(false);
   const [activeTab, setActiveTab] = useState('hotels');
   const [clearingCache, setClearingCache] = useState(false);
   const [cacheMessage, setCacheMessage] = useState<string | null>(null);
@@ -147,6 +150,170 @@ export function AdminPanel() {
       setError(`Failed to initialize database: ${err.message}`);
     } finally {
       setInitializingDb(false);
+    }
+  };
+
+  const handleMigrateTotalRooms = async () => {
+    setMigratingDb(true);
+    try {
+      const response = await fetch(`${baseUrl}/api/admin/add-total-rooms-column`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        alert(`Migration successful: ${data.message}\n\nColumns: ${data.columns?.join(', ')}`);
+      } else {
+        alert(`Migration failed: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Migration error:', error);
+      alert('Failed to run migration. Check console for details.');
+    } finally {
+      setMigratingDb(false);
+    }
+  };
+
+  const handleExportConfig = async () => {
+    console.log('Export button clicked!');
+    setExportingConfig(true);
+    setError(''); // Clear any previous errors
+    setSuccess(''); // Clear any previous success messages
+    
+    try {
+      console.log('Fetching from:', `${baseUrl}/api/admin/export-config`);
+      const response = await fetch(`${baseUrl}/api/admin/export-config`);
+      console.log('Response status:', response.status);
+      
+      if (response.ok) {
+        const text = await response.text();
+        console.log('Data received, length:', text.length);
+        
+        // Validate it's JSON
+        try {
+          JSON.parse(text);
+          console.log('Valid JSON confirmed');
+        } catch (e) {
+          console.error('Invalid JSON received:', e);
+          setError('Received invalid JSON from server');
+          return;
+        }
+        
+        // Create blob from text
+        const blob = new Blob([text], { type: 'application/json' });
+        console.log('Blob created, size:', blob.size);
+        
+        // Try using the File System Access API if available
+        if ('showSaveFilePicker' in window) {
+          try {
+            const handle = await (window as any).showSaveFilePicker({
+              suggestedName: `dashboard-config-${new Date().toISOString().split('T')[0]}.json`,
+              types: [{
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+              }],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            console.log('File saved via File System Access API');
+            setSuccess('Configuration exported successfully!');
+            return;
+          } catch (e) {
+            console.log('File System Access API cancelled or failed:', e);
+            // Fall through to traditional method
+          }
+        }
+        
+        // Fallback: Force download by setting window.location to data URL
+        const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(text)}`;
+        const filename = `dashboard-config-${new Date().toISOString().split('T')[0]}.json`;
+        
+        // Create a temporary iframe to trigger download without navigation
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        const iframeDoc = iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(`
+            <html>
+              <body>
+                <a id="download-link" href="${dataUrl}" download="${filename}">Download</a>
+                <script>
+                  document.getElementById('download-link').click();
+                </script>
+              </body>
+            </html>
+          `);
+          iframeDoc.close();
+        }
+        
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          console.log('Download cleanup complete');
+        }, 1000);
+        
+        setSuccess('Configuration exported successfully! Check your downloads folder.');
+      } else {
+        const errorText = await response.text();
+        console.error('Export failed with status:', response.status);
+        console.error('Error response:', errorText);
+        
+        try {
+          const data = JSON.parse(errorText);
+          setError(`Export failed: ${data.error || 'Unknown error'}`);
+        } catch {
+          setError(`Export failed with status ${response.status}: ${errorText}`);
+        }
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      setError(`Failed to export configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setExportingConfig(false);
+    }
+  };
+
+  const handleImportConfig = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!confirm('WARNING: This will REPLACE all existing configuration data. Are you sure you want to continue?')) {
+      event.target.value = ''; // Reset file input
+      return;
+    }
+
+    setImportingConfig(true);
+    try {
+      const fileContent = await file.text();
+      const config = JSON.parse(fileContent);
+
+      const response = await fetch(`${baseUrl}/api/admin/import-config`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        alert(`Configuration imported successfully!\n\nImported:\n${Object.entries(data.imported).map(([key, value]) => `- ${key}: ${value}`).join('\n')}`);
+        // Refresh the page to show new data
+        window.location.reload();
+      } else {
+        alert(`Import failed: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      alert('Failed to import configuration. Check console for details.');
+    } finally {
+      setImportingConfig(false);
+      event.target.value = ''; // Reset file input
     }
   };
 
@@ -323,8 +490,7 @@ export function AdminPanel() {
             <Button
               onClick={initializeDatabase}
               disabled={initializingDb}
-              variant="default"
-              className="shrink-0"
+              variant="destructive"
             >
               {initializingDb ? 'Initializing...' : 'Initialize Database'}
             </Button>
@@ -359,19 +525,65 @@ export function AdminPanel() {
             <CardHeader>
               <CardTitle>Database Tools</CardTitle>
               <CardDescription>
-                Initialize the database schema (creates tables if they don't exist)
+                Initialize the database schema and manage configuration backups
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex gap-4 items-center">
-              <Button
-                onClick={initializeDatabase}
-                disabled={initializingDb}
-                variant="outline"
-              >
-                {initializingDb ? 'Initializing...' : 'Initialize Database'}
-              </Button>
-              <div className="text-sm text-muted-foreground">
-                <p>Run this once to create the database tables. Safe to run multiple times.</p>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4 items-center">
+                <Button
+                  onClick={initializeDatabase}
+                  disabled={initializingDb}
+                  variant="destructive"
+                >
+                  {initializingDb ? 'Initializing...' : 'Initialize Database'}
+                </Button>
+                <Button
+                  onClick={handleMigrateTotalRooms}
+                  disabled={migratingDb}
+                  variant="secondary"
+                >
+                  {migratingDb ? 'Migrating...' : 'Add Total Rooms Column'}
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  <p>Run this once to create the database tables. Safe to run multiple times.</p>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-2">Configuration Backup & Restore</h4>
+                <div className="flex gap-2 mb-2">
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleExportConfig();
+                    }}
+                    disabled={exportingConfig}
+                    variant="outline"
+                    type="button"
+                  >
+                    📥 {exportingConfig ? 'Exporting...' : 'Export Configuration'}
+                  </Button>
+                  <Button
+                    onClick={() => document.getElementById('import-config-input')?.click()}
+                    disabled={importingConfig}
+                    variant="outline"
+                  >
+                    📤 {importingConfig ? 'Importing...' : 'Import Configuration'}
+                  </Button>
+                  <input
+                    id="import-config-input"
+                    type="file"
+                    accept=".json"
+                    onChange={handleImportConfig}
+                    style={{ display: 'none' }}
+                    disabled={importingConfig}
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Export creates a backup of all configuration data (hotels, templates, metrics, etc.). 
+                  Import will restore from a backup file and replace all existing data.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -735,6 +947,22 @@ export function AdminPanel() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

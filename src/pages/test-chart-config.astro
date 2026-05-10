@@ -1,0 +1,31 @@
+---
+import MainLayout from '../layouts/main.astro';
+import { baseUrl } from '../lib/base-url';
+import { ChartConfiguratorSimple } from '../components/ChartConfiguratorSimple';
+---
+
+<MainLayout>
+  <div class="min-h-screen bg-background p-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold font-heading">Chart Configurator</h1>
+          <p class="text-muted-foreground">
+            Configure charts using Webflow input components
+          </p>
+        </div>
+        <a
+          href={`${baseUrl}/`}
+          class="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+        >
+          ← Back to Home
+        </a>
+      </div>
+
+      {/* Chart Configurator */}
+      <ChartConfiguratorSimple client:only="react" />
+    </div>
+  </div>
+</MainLayout>
+

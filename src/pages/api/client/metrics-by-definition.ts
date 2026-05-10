@@ -158,7 +158,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
         // Then, calculate all formula-based metrics for this template
         for (const metric of templateMetrics) {
           try {
-            const rawValue = evaluateFormula(metric.formula, row);
+            const rawValue = evaluateFormula(metric.formula, row, hotel);
             const formattedValue = formatValue(rawValue, metric);
 
             allResults.push({
@@ -226,7 +226,7 @@ function formatValue(value: number, metric: any): string {
   return `${prefix}${formatted}${suffix}`;
 }
 
-function evaluateFormula(formula: string, values: Record<string, any>): number {
+function evaluateFormula(formula: string, values: Record<string, any>, hotel: any): number {
   try {
     // If formula is just a column name, return that value
     if (values.hasOwnProperty(formula)) {
@@ -235,6 +235,13 @@ function evaluateFormula(formula: string, values: Record<string, any>): number {
 
     // Replace column names with their values
     let expression = formula;
+    
+    // First, replace ROOM_COUNT with the hotel's total_rooms value
+    if (hotel.total_rooms) {
+      expression = expression.replace(/\bROOM_COUNT\b/g, String(hotel.total_rooms));
+    }
+    
+    // Then replace column names with their values
     for (const [key, value] of Object.entries(values)) {
       // Only replace if it's a number
       if (typeof value === 'number' || !isNaN(Number(value))) {
@@ -251,6 +258,8 @@ function evaluateFormula(formula: string, values: Record<string, any>): number {
     return 0;
   }
 }
+
+
 
 
 

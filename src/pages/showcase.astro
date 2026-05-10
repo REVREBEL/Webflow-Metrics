@@ -1,12 +1,8 @@
 ---
 import MainLayout from '../layouts/main.astro';
-import { ComponentShowcaseSimple } from '../components/ComponentShowcaseSimple';
+import ComponentShowcaseSimple from '../components/ComponentShowcaseSimple';
 ---
 
 <MainLayout>
-  <div id="showcase-root" class="min-h-screen bg-background">
-    <ComponentShowcaseSimple client:only="react" />
-  </div>
+  <ComponentShowcaseSimple client:only="react" />
 </MainLayout>
-
-

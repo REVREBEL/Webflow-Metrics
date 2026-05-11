@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../../lib/bigquery-rest-client';
 import { decrypt } from '../../../../lib/encryption';
 
 const headers = {
@@ -54,20 +54,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Decrypt service account JSON
     const serviceAccountJson = await decrypt(hotel.service_account_json, env);
-    const credentials = JSON.parse(serviceAccountJson);
 
-    // Initialize BigQuery client
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials,
-      location: hotel.data_location || 'US',
-    });
+    // Initialize BigQuery REST client (Cloudflare Workers compatible)
+    const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
     // Get table metadata
-    const dataset = bigquery.dataset(dataset_id);
-    const table = dataset.table(table_id);
-    
-    const [metadata] = await table.getMetadata();
+    const metadata = await bigquery.getTable(dataset_id, table_id);
     const schema = metadata.schema;
 
     if (!schema || !schema.fields) {
@@ -103,7 +95,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         project_id: hotel.project_id,
         full_table_path: `${hotel.project_id}.${dataset_id}.${table_id}`,
         columns,
-        row_count: metadata.numRows || 0,
+        row_count: metadata.numRows || '0',
       }),
       { status: 200, headers }
     );
@@ -125,3 +117,5 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+

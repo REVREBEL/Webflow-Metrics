@@ -154,6 +154,7 @@ export const POST: APIRoute = async ({ locals }) => {
       CREATE TABLE IF NOT EXISTS metric_definitions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         metric_name TEXT NOT NULL,
+        display_name TEXT,
         data_template_id INTEGER NOT NULL,
         formula TEXT NOT NULL,
         format_type TEXT NOT NULL DEFAULT 'number',
@@ -390,6 +391,7 @@ export const OPTIONS: APIRoute = async () => {
     },
   });
 };
+
 
 
 

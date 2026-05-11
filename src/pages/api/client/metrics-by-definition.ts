@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { decrypt } from '../../../lib/encryption';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../lib/bigquery-rest-client';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -92,14 +92,10 @@ export const GET: APIRoute = async ({ url, locals }) => {
       );
     }
 
-    const serviceAccountJson = await decrypt(hotel.service_account_json, encryptionKey);
-    const serviceAccount = JSON.parse(serviceAccountJson);
+    const serviceAccountJson = await decrypt(hotel.service_account_json, env);
 
-    // Initialize BigQuery
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials: serviceAccount,
-    });
+    // Initialize BigQuery REST client (Cloudflare Workers compatible)
+    const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
     // Group metrics by data template to avoid duplicate queries
     const templateGroups = new Map<number, any[]>();
@@ -135,7 +131,11 @@ export const GET: APIRoute = async ({ url, locals }) => {
 
         // Build and execute the query once for this template
         const query = buildQuery(firstMetric, hotel, year, month);
-        const [rows] = await bigquery.query({ query });
+        const rows = await bigquery.query({
+          query,
+          location: hotel.data_location || 'US',
+          timeoutMs: 30000,
+        });
         const row = rows[0] || {};
 
         // Parse output columns
@@ -237,8 +237,9 @@ function evaluateFormula(formula: string, values: Record<string, any>, hotel: an
     let expression = formula;
     
     // First, replace ROOM_COUNT with the hotel's total_rooms value
-    if (hotel.total_rooms) {
-      expression = expression.replace(/\bROOM_COUNT\b/g, String(hotel.total_rooms));
+    if (hotel.total_rooms != null) {
+      const roomCount = Number(hotel.total_rooms);
+      expression = expression.replace(/\bROOM_COUNT\b/g, String(roomCount));
     }
     
     // Then replace column names with their values
@@ -258,6 +259,11 @@ function evaluateFormula(formula: string, values: Record<string, any>, hotel: an
     return 0;
   }
 }
+
+
+
+
+
 
 
 

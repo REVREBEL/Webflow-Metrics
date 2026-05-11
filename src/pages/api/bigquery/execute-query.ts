@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../lib/bigquery-rest-client';
+import { decrypt } from '../../../lib/encryption';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -45,8 +46,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Decrypt credentials
-    const serviceAccountJson = hotel.service_account_json;
-    const credentials = JSON.parse(serviceAccountJson);
+    const serviceAccountJson = await decrypt(hotel.service_account_json, env);
 
     // Check cache if enabled
     if (useCache && db) {
@@ -69,11 +69,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     }
 
-    // Initialize BigQuery client
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials,
-    });
+    // Initialize BigQuery REST client (Cloudflare Workers compatible)
+    const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
     // Build params object from variables array
     const params: Record<string, any> = {};
@@ -87,11 +84,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     console.log('Executing query with params:', params);
 
+    // Note: BigQuery REST API doesn't support parameterized queries the same way
+    // We need to replace parameters in the query string
+    let finalQuery = query;
+    for (const [key, value] of Object.entries(params)) {
+      const placeholder = `@${key}`;
+      const replacement = typeof value === 'string' ? `'${value}'` : String(value);
+      finalQuery = finalQuery.replace(new RegExp(placeholder, 'g'), replacement);
+    }
+
     // Execute query
-    const [rows] = await bigquery.query({
-      query,
-      params,
+    const rows = await bigquery.query({
+      query: finalQuery,
       location: hotel.data_location || 'US',
+      timeoutMs: 30000,
     });
 
     console.log('Query executed successfully, rows:', rows?.length);
@@ -129,6 +135,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 };
+
+
 
 
 

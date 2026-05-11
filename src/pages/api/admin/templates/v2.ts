@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../../lib/bigquery-rest-client';
 import { decrypt } from '../../../../lib/encryption';
 
+// SECURITY: Restrictive CORS - only allow same-origin requests
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export const OPTIONS: APIRoute = async () => {
@@ -14,8 +14,69 @@ export const OPTIONS: APIRoute = async () => {
 };
 
 /**
+ * Validate SQL query patterns for security
+ * Only allow SELECT statements from expected datasets
+ */
+function validateQuerySecurity(query: string, hotel: any): { valid: boolean; error?: string } {
+  const normalizedQuery = query.trim().toUpperCase();
+  
+  // 1. Must start with SELECT
+  if (!normalizedQuery.startsWith('SELECT')) {
+    return { valid: false, error: 'Only SELECT queries are allowed' };
+  }
+  
+  // 2. No multi-statement queries (check for semicolons not in strings)
+  const semicolonCount = (query.match(/;/g) || []).length;
+  if (semicolonCount > 0) {
+    return { valid: false, error: 'Multi-statement queries are not allowed' };
+  }
+  
+  // 3. Blacklist dangerous keywords
+  const dangerousKeywords = [
+    'DROP', 'DELETE', 'INSERT', 'UPDATE', 'CREATE', 'ALTER', 
+    'TRUNCATE', 'GRANT', 'REVOKE', 'EXEC', 'EXECUTE'
+  ];
+  
+  for (const keyword of dangerousKeywords) {
+    // Use word boundaries to avoid false positives
+    const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+    if (regex.test(query)) {
+      return { valid: false, error: `Keyword '${keyword}' is not allowed` };
+    }
+  }
+  
+  // 4. Must reference the hotel's project and dataset
+  if (!query.includes(hotel.project_id)) {
+    return { valid: false, error: 'Query must reference the configured project_id' };
+  }
+  
+  if (hotel.dataset_id && !query.includes(hotel.dataset_id)) {
+    return { valid: false, error: 'Query must reference the configured dataset_id' };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Sanitize error messages to avoid leaking sensitive information
+ */
+function sanitizeError(error: any): string {
+  const message = error.message || 'Unknown error';
+  
+  // Remove any potential credential information
+  const sanitized = message
+    .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL]')
+    .replace(/\b[A-Za-z0-9+/]{40,}\b/g, '[KEY]')
+    .replace(/\b\d{12,}\b/g, '[ID]');
+  
+  return sanitized;
+}
+
+/**
  * Validate a data template by testing it against BigQuery
  * This endpoint requires a hotel_code to get credentials for testing
+ * 
+ * SECURITY: This endpoint should be protected by authentication middleware
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -28,6 +89,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
         { status: 500, headers }
       );
     }
+
+    // TODO: Add authentication check here
+    // const authHeader = request.headers.get('Authorization');
+    // if (!authHeader || !isValidAdminToken(authHeader)) {
+    //   return new Response(
+    //     JSON.stringify({ error: 'Unauthorized' }),
+    //     { status: 401, headers }
+    //   );
+    // }
 
     const body = await request.json() as {
       hotel_code: string;
@@ -73,40 +143,54 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const hotel = hotelResult as any;
 
-    // Decrypt service account
-    const encryptionKey = env?.ENCRYPTION_KEY;
-    if (!encryptionKey) {
+    // Build test query with sample parameters BEFORE security validation
+    const testQuery = buildTestQuery(query_template, hotel);
+
+    // SECURITY: Validate query before execution
+    const securityCheck = validateQuerySecurity(testQuery, hotel);
+    if (!securityCheck.valid) {
+      return new Response(
+        JSON.stringify({ 
+          valid: false,
+          error: 'Query security validation failed',
+          details: securityCheck.error
+        }),
+        { status: 400, headers }
+      );
+    }
+
+    // Decrypt service account - FIXED: Pass env object instead of string
+    if (!env?.ENCRYPTION_KEY) {
       return new Response(
         JSON.stringify({ error: 'Encryption key not configured' }),
         { status: 500, headers }
       );
     }
 
-    const serviceAccountJson = await decrypt(hotel.service_account_json, encryptionKey);
-    const serviceAccount = JSON.parse(serviceAccountJson);
+    const serviceAccountJson = await decrypt(hotel.service_account_json, env);
 
-    // Initialize BigQuery
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials: serviceAccount,
-    });
-
-    // Build test query with sample parameters
-    const testQuery = buildTestQuery(query_template, hotel);
+    // Initialize BigQuery REST client (Cloudflare Workers compatible)
+    const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
     // Execute query with LIMIT 1 to test structure
     const validationQuery = `${testQuery} LIMIT 1`;
     
     let queryResult;
     try {
-      [queryResult] = await bigquery.query({ query: validationQuery });
+      // Execute query with timeout and byte limit
+      queryResult = await bigquery.query({
+        query: validationQuery,
+        location: hotel.data_location || 'US',
+        maximumBytesBilled: '100000000', // 100MB limit
+        timeoutMs: 30000, // 30 second timeout
+      });
     } catch (error: any) {
+      // SECURITY: Sanitize error messages
       return new Response(
         JSON.stringify({ 
           valid: false,
           error: 'Query execution failed',
-          details: error.message,
-          query: validationQuery
+          details: sanitizeError(error)
         }),
         { status: 400, headers }
       );
@@ -123,13 +207,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const isValid = missingColumns.length === 0 && extraColumns.length === 0;
 
+    // SECURITY: Don't return full query text or raw sample data to unauthorized callers
+    // Only return column structure information
     const validationResult = {
       valid: isValid,
       declaredColumns: output_columns,
       actualColumns,
       missingColumns,
       extraColumns,
-      sampleRow: queryResult[0] || null,
+      // Only return column names and types, not actual data
+      columnTypes: queryResult.length > 0 
+        ? Object.entries(queryResult[0]).reduce((acc, [key, value]) => {
+            acc[key] = typeof value;
+            return acc;
+          }, {} as Record<string, string>)
+        : {},
       message: isValid 
         ? 'Query validation successful! All columns match.'
         : 'Column mismatch detected. Please review the differences below.'
@@ -229,11 +321,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   } catch (error: any) {
     console.error('Template validation error:', error);
+    // SECURITY: Sanitize error messages in production
     return new Response(
       JSON.stringify({ 
         valid: false,
-        error: error.message,
-        stack: error.stack
+        error: 'Internal server error',
+        details: sanitizeError(error)
       }),
       { status: 500, headers }
     );
@@ -255,8 +348,8 @@ function buildTestQuery(template: string, hotel: any): string {
   query = query.replace(/\{year\}/g, year);
   query = query.replace(/\{month\}/g, month);
 
-  // Replace @parameters with test values
-  query = query.replace(/@hotel_code/g, `'${hotel.hotel_code}'`);
+  // Replace @parameters with test values (properly escaped)
+  query = query.replace(/@hotel_code/g, `'${hotel.hotel_code.replace(/'/g, "''")}'`);
   query = query.replace(/@start_date/g, `'${year}-${month}-01'`);
   query = query.replace(/@end_date/g, `'${year}-${month}-28'`);
   query = query.replace(/@year/g, year);
@@ -264,3 +357,5 @@ function buildTestQuery(template: string, hotel: any): string {
 
   return query;
 }
+
+

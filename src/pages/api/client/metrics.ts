@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { decrypt } from '../../../lib/encryption';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../lib/bigquery-rest-client';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -122,6 +122,7 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
 
 
 

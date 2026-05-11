@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { BigQueryClient, parseServiceAccountJson } from '../../../lib/bigquery-client';
+import { createBigQueryClient } from '../../../lib/bigquery-rest-client';
 
 interface TestConnectionRequest {
   serviceAccountJson: string;
@@ -18,7 +18,8 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const credentials = parseServiceAccountJson(serviceAccountJson);
+    // Parse to validate and get project ID
+    const credentials = JSON.parse(serviceAccountJson);
     const projectId = credentials.project_id;
 
     if (!projectId) {
@@ -28,20 +29,20 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const client = new BigQueryClient({ credentials, projectId, location: dataLocation || 'US' });
-    const isConnected = await client.testConnection();
+    // Test connection by creating client and running a simple query
+    const client = createBigQueryClient(projectId, serviceAccountJson);
+    
+    // Run a simple query to test the connection
+    await client.query({
+      query: 'SELECT 1 as test',
+      location: dataLocation || 'US',
+      timeoutMs: 10000,
+    });
 
-    if (isConnected) {
-      return new Response(
-        JSON.stringify({ success: true, projectId }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
-    } else {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Connection test failed' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    return new Response(
+      JSON.stringify({ success: true, projectId }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
   } catch (error: any) {
     console.error('Test connection error:', error);
     return new Response(
@@ -50,3 +51,4 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 };
+

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../../lib/bigquery-rest-client';
 import { decrypt } from '../../../../lib/encryption';
 
 const headers = {
@@ -53,25 +53,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Decrypt service account JSON
     const serviceAccountJson = await decrypt(hotel.service_account_json, env);
-    const credentials = JSON.parse(serviceAccountJson);
 
-    // Initialize BigQuery client
-    const bigquery = new BigQuery({
-      projectId: hotel.project_id,
-      credentials,
-      location: hotel.data_location || 'US',
-    });
+    // Initialize BigQuery REST client (Cloudflare Workers compatible)
+    const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
     // List tables in the dataset
-    const dataset = bigquery.dataset(dataset_id);
-    const [tables] = await dataset.getTables();
+    const tables = await bigquery.listTables(dataset_id);
 
     const tableList = tables.map((table: any) => ({
-      table_id: table.id,
-      table_name: table.metadata?.friendlyName || table.id,
-      description: table.metadata?.description || null,
-      created: table.metadata?.creationTime ? new Date(parseInt(table.metadata.creationTime)).toISOString() : null,
-      row_count: table.metadata?.numRows || 0,
+      table_id: table.tableReference.tableId,
+      table_name: table.friendlyName || table.tableReference.tableId,
+      description: null, // Basic list doesn't include description
+      created: null,
+      row_count: 0,
     }));
 
     return new Response(
@@ -101,3 +95,5 @@ export const OPTIONS: APIRoute = async () => {
     headers,
   });
 };
+
+

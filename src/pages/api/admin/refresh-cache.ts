@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { decrypt } from '../../../lib/encryption';
-import { BigQuery } from '@google-cloud/bigquery';
+import { createBigQueryClient } from '../../../lib/bigquery-rest-client';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -126,15 +126,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
             filters: t.filters ? JSON.parse(t.filters) : null,
           }));
 
-          // Decrypt credentials and initialize BigQuery
+          // Decrypt credentials and initialize BigQuery REST client
           const serviceAccountJson = await decrypt(hotel.service_account_json, env);
-          const credentials = JSON.parse(serviceAccountJson);
 
-          const bigquery = new BigQuery({
-            projectId: hotel.project_id,
-            credentials,
-            location: hotel.data_location || 'US',
-          });
+          const bigquery = createBigQueryClient(hotel.project_id, serviceAccountJson);
 
           // Calculate date range
           const startDate = `${yearToRefresh}-${String(monthToRefresh).padStart(2, '0')}-01`;
@@ -228,7 +223,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
               console.log(`[Cache] Executing query for ${hotelCode} - ${template.metric_name}`);
 
-              const [rows] = await bigquery.query({ query });
+              const rows = await bigquery.query({
+                query,
+                location: hotel.data_location || 'US',
+                timeoutMs: 30000,
+              });
 
               let value = null;
               if (rows && rows.length > 0) {
@@ -345,6 +344,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 export const OPTIONS: APIRoute = async () => {
   return new Response(null, { status: 204, headers });
 };
+
+
+
 
 
 

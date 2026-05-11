@@ -17,7 +17,36 @@ export default defineConfig({
 
   vite: {
     build: {
-      cssMinify: "esbuild",
+ 	cssMinify: "esbuild",
     },
-  },
+    ssr: {
+      external: [
+        "@google-cloud/bigquery",
+        "@google-cloud/common",
+        "@google-cloud/paginator",
+        "@google-cloud/projectify",
+        "google-auth-library",
+        "gaxios",
+        "teeny-request",
+        "retry-request",
+        "node-fetch",
+        "jws",
+        "jwa",
+        "util",
+        "stream",
+        "crypto",
+        "fs",
+        "path",
+        "os",
+        "http",
+        "https",
+        "child_process",
+        "querystring",
+        "net",
+        "tls",
+        "url",
+        "assert"
+      ]
+    }
+  }
 });

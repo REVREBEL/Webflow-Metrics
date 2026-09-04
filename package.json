@@ -76,7 +76,7 @@
     "@astrojs/check": "0.9.9",
     "@astrojs/tailwind": "^6.0.2",
     "@babel/preset-typescript": "7.28.5",
-    "autoprefixer": "10.5.0",
+    "autoprefixer": "10.5.5",
     "kill-port": "2.0.1",
     "postcss": "8.5.14",
     "tailwindcss": "3.4.19",

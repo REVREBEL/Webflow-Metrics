@@ -70,7 +70,7 @@
     "tailwind-merge": "3.5.0",
     "vaul": "1.1.2",
     "webflow-api": "3.3.4",
-    "zod": "4.0.13"
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",
